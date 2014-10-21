@@ -1,19 +1,4 @@
 if (Meteor.isClient) {
-    // counter starts at 0
-    Session.setDefault("counter", 0);
-
-//    Template.hello.helpers({
-//        counter: function () {
-//            return Session.get("counter");
-//        }
-//    });
-//
-//    Template.hello.events({
-//        'click button': function () {
-//            // increment the counter when button is clicked
-//            Session.set("counter", Session.get("counter") + 1);
-//        }
-//    });
 
     Template.column.helpers({
         cards: function(prefix) {
@@ -37,11 +22,9 @@ if (Meteor.isClient) {
         }
     };
 
-    var counter;
     document.addEventListener('DOMContentLoaded', function() {
         var grid = document.querySelector('.grid');
         grid.addEventListener('dragstart', filterEvent('.card', function(e) {
-            counter=0;
             var target = e.target;
             target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
@@ -51,8 +34,7 @@ if (Meteor.isClient) {
             e.target.classList.remove('dragging');
         }), false);
         grid.addEventListener('dragenter', filterEvent('.grid__column, .card', function(e) {
-            console.log('Drag enter ', e.target);
-            counter++;
+//            console.log('Drag enter ', e.target);
             e.preventDefault();
             e.target.classList.add('over');
         }), false);
@@ -60,16 +42,14 @@ if (Meteor.isClient) {
             e.preventDefault();
         }), false);
         grid.addEventListener('dragleave', filterEvent('.grid__column, .card', function(e) {
-            console.log('Drag leave ', e.target);
-            counter--;
-            if (counter === 0) {
-                e.target.classList.remove('over');
-            }
+//            console.log('Drag leave ', e.target);
+            e.target.classList.remove('over');
         }), false);
         grid.addEventListener('drop', filterEvent('.grid__column, .card', function(e) {
             console.log('drop ', e);
             var col = e.target.matches('.grid__column') ? e.target : e.target.parentNode;
             var node = document.getElementById(e.dataTransfer.getData('text'));
+            node.classList.remove('dragging');
             col.appendChild(node.cloneNode(true));
             node.parentNode.removeChild(node);
 
@@ -77,7 +57,6 @@ if (Meteor.isClient) {
                 el.classList.remove('over'); console.log(el.classList);
             });
         }), false);
-
 
     });
 }
