@@ -24,8 +24,7 @@ html, body {
 }
 
 .grid__column.over {
-    border: 2px dotted purple;
-    background: pink;
+    background: lightblue;
 }
 .dragging {
     opacity: 0.4;

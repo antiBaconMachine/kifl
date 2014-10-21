@@ -1,19 +1,20 @@
 if (Meteor.isClient) {
 
     Template.column.helpers({
-        cards: function(prefix) {
-            return "123".split('').map(function(i) {
+        cards: function (prefix) {
+            return "123".split('').map(function (i) {
                 var id = Math.ceil(Math.random() * 10000000);
                 return {
-                        title: i +' dummy ' + id,
-                        id: id
+                    title: i + ' dummy ' + id,
+                    id: id,
+                    color: '#' + Math.floor(Math.random() * 16777215).toString(16)
                 };
             });
         }
     });
 
-    var filterEvent = function(selector, callback) {
-        return function(e) {
+    var filterEvent = function (selector, callback) {
+        return function (e) {
 
             if (e.target.matches(selector)) {
                 callback(e);
@@ -22,46 +23,73 @@ if (Meteor.isClient) {
         }
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
+    var getColumn = function (el) {
+        if (el) {
+            return el.matches('.grid__column') ? el : getColumn(el.parentNode);
+        } else {
+            return null;
+        }
+    };
+
+    //get the card or column we dropped on
+    var getDropRoot = function (el) {
+        if (el) {
+            return el.matches('.grid__column, .card') ? el : getDropRoot(el.parentNode);
+        } else {
+            return null;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
         var grid = document.querySelector('.grid');
-        grid.addEventListener('dragstart', filterEvent('.card', function(e) {
+
+        [].forEach.call(document.querySelectorAll('.grid__column'), function(col) {
+            new Dragster(col);
+        });
+
+        grid.addEventListener('dragstart', filterEvent('.card', function (e) {
             var target = e.target;
             target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text', target.id);
         }), false);
-        grid.addEventListener('dragend', filterEvent('.card', function(e) {
+        grid.addEventListener('dragend', filterEvent('.card', function (e) {
             e.target.classList.remove('dragging');
         }), false);
-        grid.addEventListener('dragenter', filterEvent('.grid__column, .card', function(e) {
-//            console.log('Drag enter ', e.target);
+        document.addEventListener('dragster:enter', filterEvent('.grid__column', function (e) {
+            console.log('Drag enter ', e.target);
 //            e.preventDefault();
             e.target.classList.add('over');
         }), false);
-        grid.addEventListener('dragover', filterEvent('.grid__column', function(e) {
-            console.log('drag over col ', e.target);
+        grid.addEventListener('dragover', filterEvent('.grid *', function (e) {
+            //console.log('drag over', e.target);
             e.preventDefault();
         }), false);
-        grid.addEventListener('dragover', filterEvent('.card', function(e) {
-            console.log('drag over card', e.target);
-            e.preventDefault();
-        }), false);
-        grid.addEventListener('dragleave', filterEvent('.grid__column, .card', function(e) {
-//            console.log('Drag leave ', e.target);
+        document.addEventListener('dragster:leave', filterEvent('.grid__column', function (e) {
+            console.log('Drag leave ', e.target);
             e.target.classList.remove('over');
         }), false);
-        grid.addEventListener('drop', filterEvent('.grid__column, .card', function(e) {
-            console.log('drop ', e);
-            var col = e.target.matches('.grid__column') ? e.target : e.target.parentNode;
-
+        grid.addEventListener('drop', filterEvent('.grid *', function (e) {
+            console.log('drop ', e.dataTransfer.getData('text'), e);
+            var dropRoot = getDropRoot(e.target);
+            var dropCol = getColumn(dropRoot);
             var node = document.getElementById(e.dataTransfer.getData('text'));
-            node.classList.remove('dragging');
-            col.appendChild(node.cloneNode(true));
-            node.parentNode.removeChild(node);
 
-            [].forEach.call(document.querySelectorAll('.over'), function(el) {
-                el.classList.remove('over'); console.log(el.classList);
+            if (dropCol && dropRoot !== node) {
+                node.classList.remove('dragging');
+                node.parentNode.removeChild(node);
+                if (dropRoot == dropCol) {
+                    dropCol.appendChild(node);
+                } else {
+                    dropCol.insertBefore(node, dropRoot);
+                }
+            }
+
+            [].forEach.call(document.querySelectorAll('.over'), function (el) {
+                el.classList.remove('over');
+                console.log(el.classList);
             });
+
             e.stopPropagation();
             e.preventDefault();
         }), false);
