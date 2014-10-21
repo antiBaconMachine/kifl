@@ -29,6 +29,7 @@ if (Meteor.isClient) {
 
     var filterEvent = function(selector, callback) {
         return function(e) {
+
             if (e.target.matches(selector)) {
                 callback(e);
                 e.stopPropagation();
@@ -46,7 +47,6 @@ if (Meteor.isClient) {
         }), false);
         grid.addEventListener('dragend', filterEvent('.card', function(e) {
             e.target.classList.remove('dragging');
-
         }), false);
         grid.addEventListener('dragenter', filterEvent('.grid__column', function(e) {
             e.preventDefault();
