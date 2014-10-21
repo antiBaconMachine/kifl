@@ -17,7 +17,7 @@ if (Meteor.isClient) {
 
             if (e.target.matches(selector)) {
                 callback(e);
-                e.stopPropagation();
+//                e.stopPropagation();
             }
         }
     };
@@ -35,10 +35,15 @@ if (Meteor.isClient) {
         }), false);
         grid.addEventListener('dragenter', filterEvent('.grid__column, .card', function(e) {
 //            console.log('Drag enter ', e.target);
-            e.preventDefault();
+//            e.preventDefault();
             e.target.classList.add('over');
         }), false);
         grid.addEventListener('dragover', filterEvent('.grid__column', function(e) {
+            console.log('drag over col ', e.target);
+            e.preventDefault();
+        }), false);
+        grid.addEventListener('dragover', filterEvent('.card', function(e) {
+            console.log('drag over card', e.target);
             e.preventDefault();
         }), false);
         grid.addEventListener('dragleave', filterEvent('.grid__column, .card', function(e) {
@@ -48,6 +53,7 @@ if (Meteor.isClient) {
         grid.addEventListener('drop', filterEvent('.grid__column, .card', function(e) {
             console.log('drop ', e);
             var col = e.target.matches('.grid__column') ? e.target : e.target.parentNode;
+
             var node = document.getElementById(e.dataTransfer.getData('text'));
             node.classList.remove('dragging');
             col.appendChild(node.cloneNode(true));
@@ -56,6 +62,8 @@ if (Meteor.isClient) {
             [].forEach.call(document.querySelectorAll('.over'), function(el) {
                 el.classList.remove('over'); console.log(el.classList);
             });
+            e.stopPropagation();
+            e.preventDefault();
         }), false);
 
     });
