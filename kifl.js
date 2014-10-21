@@ -38,14 +38,17 @@ if (Meteor.isClient) {
         } else {
             return null;
         }
+    };
+
+    var clearDragOverStyles = function() {
+        [].forEach.call(document.querySelectorAll('.over'), function (el) {
+            el.classList.remove('over');
+            console.log(el.classList);
+        });
     }
 
     document.addEventListener('DOMContentLoaded', function () {
         var grid = document.querySelector('.grid');
-
-        [].forEach.call(document.querySelectorAll('.grid__column'), function(col) {
-            new Dragster(col);
-        });
 
         grid.addEventListener('dragstart', filterEvent('.card', function (e) {
             var target = e.target;
@@ -56,18 +59,18 @@ if (Meteor.isClient) {
         grid.addEventListener('dragend', filterEvent('.card', function (e) {
             e.target.classList.remove('dragging');
         }), false);
-        document.addEventListener('dragster:enter', filterEvent('.grid__column', function (e) {
-            console.log('Drag enter ', e.target);
-//            e.preventDefault();
+        document.addEventListener('dragenter', filterEvent('.grid__column', function (e) {
+            //console.log('Drag enter ', e.target);
+            clearDragOverStyles();
             e.target.classList.add('over');
         }), false);
         grid.addEventListener('dragover', filterEvent('.grid *', function (e) {
             //console.log('drag over', e.target);
             e.preventDefault();
         }), false);
-        document.addEventListener('dragster:leave', filterEvent('.grid__column', function (e) {
-            console.log('Drag leave ', e.target);
-            e.target.classList.remove('over');
+        document.addEventListener('dragenter', filterEvent('body, .container', function (e) {
+            console.log('Drag enter doc ', e.target);
+            clearDragOverStyles();
         }), false);
         grid.addEventListener('drop', filterEvent('.grid *', function (e) {
             console.log('drop ', e.dataTransfer.getData('text'), e);
@@ -85,10 +88,7 @@ if (Meteor.isClient) {
                 }
             }
 
-            [].forEach.call(document.querySelectorAll('.over'), function (el) {
-                el.classList.remove('over');
-                console.log(el.classList);
-            });
+            clearDragOverStyles();
 
             e.stopPropagation();
             e.preventDefault();
