@@ -22,3 +22,11 @@ html, body {
     margin: 0 2px 5px;
     padding: 5px;
 }
+
+.over {
+    border: 2px dotted purple;
+    background: pink;
+}
+.dragging {
+    opacity: 0.4;
+}
