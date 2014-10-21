@@ -23,7 +23,7 @@ html, body {
     padding: 5px;
 }
 
-.over {
+.grid__column.over {
     border: 2px dotted purple;
     background: pink;
 }

@@ -37,9 +37,11 @@ if (Meteor.isClient) {
         }
     };
 
+    var counter;
     document.addEventListener('DOMContentLoaded', function() {
         var grid = document.querySelector('.grid');
         grid.addEventListener('dragstart', filterEvent('.card', function(e) {
+            counter=0;
             var target = e.target;
             target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
@@ -48,22 +50,27 @@ if (Meteor.isClient) {
         grid.addEventListener('dragend', filterEvent('.card', function(e) {
             e.target.classList.remove('dragging');
         }), false);
-        grid.addEventListener('dragenter', filterEvent('.grid__column', function(e) {
+        grid.addEventListener('dragenter', filterEvent('.grid__column, .card', function(e) {
+            console.log('Drag enter ', e.target);
+            counter++;
             e.preventDefault();
             e.target.classList.add('over');
         }), false);
         grid.addEventListener('dragover', filterEvent('.grid__column', function(e) {
             e.preventDefault();
         }), false);
-        grid.addEventListener('dragleave', filterEvent('.grid__column', function(e) {
-            e.target.classList.remove('over');
+        grid.addEventListener('dragleave', filterEvent('.grid__column, .card', function(e) {
+            console.log('Drag leave ', e.target);
+            counter--;
+            if (counter === 0) {
+                e.target.classList.remove('over');
+            }
         }), false);
-        grid.addEventListener('drop', filterEvent('.grid__column', function(e) {
+        grid.addEventListener('drop', filterEvent('.grid__column, .card', function(e) {
             console.log('drop ', e);
-            var id = e.dataTransfer.getData('text');
-            var node = document.getElementById(id);
-            node.style.opacity = '1';
-            e.target.appendChild(node.cloneNode(true));
+            var col = e.target.matches('.grid__column') ? e.target : e.target.parentNode;
+            var node = document.getElementById(e.dataTransfer.getData('text'));
+            col.appendChild(node.cloneNode(true));
             node.parentNode.removeChild(node);
 
             [].forEach.call(document.querySelectorAll('.over'), function(el) {
