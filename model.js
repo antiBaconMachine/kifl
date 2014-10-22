@@ -22,29 +22,36 @@ createCard = function (options) {
     Meteor.call('createCard', _.extend({ _id: id }, options));
     return id;
 };
+updateCard = function (options) {
+    Meteor.call('updateCard', options);
+    return options._id;
+};
 
 var NonEmptyString = Match.Where(function (x) {
     check(x, String);
     return x.length !== 0;
 });
 
-Meteor.methods({
-    // options should include: title, description, x, y, public
-    createCard: function (options) {
-        check(options, {
-            title: NonEmptyString,
-            description: NonEmptyString,
-            col: NonEmptyString,
-            _id: Match.Optional(NonEmptyString)
-        });
+var validateCard = function(options) {
+    check(options, {
+        title: NonEmptyString,
+        description: NonEmptyString,
+        col: NonEmptyString,
+        _id: Match.Optional(NonEmptyString)
+    });
 
-//        if (options.title.length > 100)
+    //        if (options.title.length > 100)
 //            throw new Meteor.Error(413, "Title too long");
 //        if (options.description.length > 1000)
 //            throw new Meteor.Error(413, "Description too long");
 //        if (! this.userId)
 //            throw new Meteor.Error(403, "You must be logged in");
+}
 
+Meteor.methods({
+    // options should include: title, description, x, y, public
+    createCard: function (options) {
+        validateCard(options);
         var id = options._id || Random.id();
         Cards.insert({
             _id: id,
@@ -55,5 +62,18 @@ Meteor.methods({
             color: '#' + Math.floor(Math.random() * 16777215).toString(16)
         });
         return id;
+    },
+    updateCard: function (options) {
+        var id = options._id;
+        if (!id) {
+            throw new Meteor.Error(406, "Can not update without an id");
+        }
+        Cards.update({
+            _id: id
+        }, {
+            $set: {
+                col: options.col
+            }
+        })
     }
 });

@@ -133,7 +133,8 @@ if (Meteor.isClient) {
             console.log('drop ', e.dataTransfer.getData('text'), e);
             var dropRoot = getDropRoot(e.target);
             var dropCol = getColumn(dropRoot);
-            var node = document.getElementById(e.dataTransfer.getData('text'));
+            var id = e.dataTransfer.getData('text');
+            var node = document.getElementById(id);
 
             if (dropCol && dropRoot !== node) {
                 node.classList.remove('dragging');
@@ -143,6 +144,10 @@ if (Meteor.isClient) {
                 } else {
                     dropCol.insertBefore(node, dropRoot);
                 }
+                updateCard({
+                    _id: id,
+                    col: dropCol.id
+                });
             }
 
             clearDragOverStyles();
