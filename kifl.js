@@ -12,6 +12,7 @@ if (Meteor.isClient) {
             });
         }
     });
+
     Template.column.events({
         'dblclick .grid__column': function (event, template) {
             console.log('dblclick column');
@@ -24,8 +25,12 @@ if (Meteor.isClient) {
     /////////////////////////CREATE CARD//////////////////////
     var openCreateDialog = function () {
         Session.set("createError", null);
-        Session.set("showCreateDialog", true);
+        $('#createDialog').modal('show');
     };
+    var closeCreateDialog = function () {
+        $('#createDialog').modal('hide');
+    }
+
     Template.page.helpers({
         showCreateDialog: function () {
             return Session.get("showCreateDialog");
@@ -36,24 +41,19 @@ if (Meteor.isClient) {
         'click .save': function (event, template) {
             var title = template.find(".title").value;
             var description = template.find(".description").value;
-
             if (title.length) {
                 var id = createCard({
                     title: title,
                     description: description
                 });
-
                 Session.set("selected", id);
-                Session.set("showCreateDialog", false);
+                closeCreateDialog();
             } else {
                 Session.set("createError",
                     "It needs a title and a description, or why bother?");
             }
         },
-
-        'click .cancel': function () {
-            Session.set("showCreateDialog", false);
-        }
+        'click .cancel': closeCreateDialog
     });
 
     Template.createDialog.helpers({

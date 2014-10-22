@@ -7,9 +7,7 @@
 </body>
 
 <template name="page">
-    {{#if showCreateDialog}}
     {{> createDialog}}
-    {{/if}}
     <div class="container">
         {{> grid}}
     </div>
@@ -38,29 +36,29 @@
 </template>
 
 <template name="createDialog">
-    <div class="mask"></div>
-    <div class="modal">
-        <div class="modal-header">
-            <button type="button" class="close cancel">&times;</button>
-            <h3>Add Card</h3>
-        </div>
+    <div class="modal fade" id="createDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close cancel" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Add Card</h4>
+                </div>
+                <div class="modal-body">
+                    {{#if error}}
+                    <div class="alert alert-error">{{error}}</div>
+                    {{/if}}
 
-        <div class="modal-body">
-            {{#if error}}
-            <div class="alert alert-error">{{error}}</div>
-            {{/if}}
+                    <label>Title</label>
+                    <input type="text" class="title span5">
 
-            <label>Title</label>
-            <input type="text" class="title span5">
-
-            <label>Description</label>
-            <textarea class="description span5"></textarea>
-
-        </div>
-
-        <div class="modal-footer">
-            <a href="#" class="btn cancel">Cancel</a>
-            <a href="#" class="btn btn-primary save">Add Card</a>
-        </div>
-    </div>
+                    <label>Description</label>
+                    <textarea class="description span5"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default cancel" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary save">Save</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 </template>
