@@ -13,7 +13,7 @@ Cards.allow({
         return true;
     },
     remove: function (userId, card) {
-        return false;
+        return true;
     }
 });
 
@@ -35,7 +35,7 @@ var NonEmptyString = Match.Where(function (x) {
 var validateCard = function(options) {
     check(options, {
         title: NonEmptyString,
-        description: NonEmptyString,
+        description: Match.Optional(String),
         col: NonEmptyString,
         _id: Match.Optional(NonEmptyString)
     });
