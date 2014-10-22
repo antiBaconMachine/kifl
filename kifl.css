@@ -21,6 +21,8 @@ html, body {
     float: left;
     overflow: auto;
     height: 100%;
+    position: relative;
+    padding-top: 40px;
 }
 
 .card {
@@ -46,4 +48,16 @@ html, body {
     background-color: #000000;
     opacity: .4;
     z-index: 1;
+}
+
+.createCard {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 3em;
+    width: 40px;
+    line-height: 40px;
+}
+.createCard:hover {
+    text-decoration: none;
 }

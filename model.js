@@ -34,6 +34,7 @@ Meteor.methods({
         check(options, {
             title: NonEmptyString,
             description: NonEmptyString,
+            col: NonEmptyString,
             _id: Match.Optional(NonEmptyString)
         });
 
@@ -49,7 +50,9 @@ Meteor.methods({
             _id: id,
             owner: this.userId,
             title: options.title,
-            description: options.description
+            description: options.description,
+            col: options.col,
+            color: '#' + Math.floor(Math.random() * 16777215).toString(16)
         });
         return id;
     }

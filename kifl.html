@@ -16,15 +16,20 @@
 
 <template name="grid">
     <div class="grid">
-        {{>column}}
-        {{>column}}
+        {{>column source='source' id='backlog'}}
+        {{>column id='doing'}}
+        {{>column id='done'}}
     </div>
 </template>
 
 <template name="column">
-    <div class="grid__column" id="{{id}}">
-        {{#each cards}}
-        {{>card}}
+    <div class="grid__column {{source}}" id="{{id}}">
+        <h2>{{id}}</h2>
+        {{#if source}}
+        <a href="" class="createCard">&oplus;</a>
+        {{/if}}
+        {{#each cards id}}
+            {{>card}}
         {{/each}}
     </div>
 </template>

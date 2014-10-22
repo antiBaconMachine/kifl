@@ -1,24 +1,29 @@
 if (Meteor.isClient) {
 
+    Meteor.subscribe("cards");
+
     Template.column.helpers({
-        cards: function (prefix) {
-            return "123".split('').map(function (i) {
-                var id = Math.ceil(Math.random() * 10000000);
-                return {
-                    title: i + ' dummy ' + id,
-                    id: id,
-                    color: '#' + Math.floor(Math.random() * 16777215).toString(16)
-                };
-            });
+        cards: function (col) {
+//            return "123".split('').map(function (i) {
+//                var id = Math.ceil(Math.random() * 10000000);
+//                return {
+//                    title: i + ' dummy ' + id,
+//                    id: id,
+//                    color: '#' + Math.floor(Math.random() * 16777215).toString(16)
+//                };
+//            });
+            return Cards.find({"col": col});
+
         }
     });
 
     Template.column.events({
-        'dblclick .grid__column': function (event, template) {
-            console.log('dblclick column');
+        'click .createCard': function (event, template) {
 //            if (! Meteor.userId()) // must be logged in to create events
 //                return;
             openCreateDialog();
+            event.preventDefault();
+            return false;
         }
     });
 
@@ -44,7 +49,8 @@ if (Meteor.isClient) {
             if (title.length) {
                 var id = createCard({
                     title: title,
-                    description: description
+                    description: description,
+                    col: 'backlog'
                 });
                 Session.set("selected", id);
                 closeCreateDialog();
@@ -152,5 +158,9 @@ if (Meteor.isClient) {
 if (Meteor.isServer) {
     Meteor.startup(function () {
         // code to run on server at startup
+    });
+
+    Meteor.publish("cards", function () {
+        return Cards.find();
     });
 }
