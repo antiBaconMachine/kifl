@@ -12,6 +12,57 @@ if (Meteor.isClient) {
             });
         }
     });
+    Template.column.events({
+        'dblclick .grid__column': function (event, template) {
+            console.log('dblclick column');
+//            if (! Meteor.userId()) // must be logged in to create events
+//                return;
+            openCreateDialog();
+        }
+    });
+
+    /////////////////////////CREATE CARD//////////////////////
+    var openCreateDialog = function () {
+        Session.set("createError", null);
+        Session.set("showCreateDialog", true);
+    };
+    Template.page.helpers({
+        showCreateDialog: function () {
+            return Session.get("showCreateDialog");
+        }
+    });
+
+    Template.createDialog.events({
+        'click .save': function (event, template) {
+            var title = template.find(".title").value;
+            var description = template.find(".description").value;
+
+            if (title.length) {
+                var id = createCard({
+                    title: title,
+                    description: description
+                });
+
+                Session.set("selected", id);
+                Session.set("showCreateDialog", false);
+            } else {
+                Session.set("createError",
+                    "It needs a title and a description, or why bother?");
+            }
+        },
+
+        'click .cancel': function () {
+            Session.set("showCreateDialog", false);
+        }
+    });
+
+    Template.createDialog.helpers({
+        error: function () {
+            return Session.get("createError");
+        }
+    });
+    //////////////////////////////////
+
 
     var filterEvent = function (selector, callback) {
         return function (e) {

@@ -3,10 +3,17 @@
 </head>
 
 <body>
-<div class="container">
-    {{> grid}}
-</div>
+    {{> page}}
 </body>
+
+<template name="page">
+    {{#if showCreateDialog}}
+    {{> createDialog}}
+    {{/if}}
+    <div class="container">
+        {{> grid}}
+    </div>
+</template>
 
 
 <template name="grid">
@@ -19,13 +26,41 @@
 <template name="column">
     <div class="grid__column" id="{{id}}">
         {{#each cards}}
-            {{>card}}
+        {{>card}}
         {{/each}}
     </div>
 </template>
 
-<template name="card" >
+<template name="card">
     <div class="card" draggable="true" id="{{id}}" style="background-color: {{color}}">
         <h3>{{title}}</h3>
+    </div>
+</template>
+
+<template name="createDialog">
+    <div class="mask"></div>
+    <div class="modal">
+        <div class="modal-header">
+            <button type="button" class="close cancel">&times;</button>
+            <h3>Add Card</h3>
+        </div>
+
+        <div class="modal-body">
+            {{#if error}}
+            <div class="alert alert-error">{{error}}</div>
+            {{/if}}
+
+            <label>Title</label>
+            <input type="text" class="title span5">
+
+            <label>Description</label>
+            <textarea class="description span5"></textarea>
+
+        </div>
+
+        <div class="modal-footer">
+            <a href="#" class="btn cancel">Cancel</a>
+            <a href="#" class="btn btn-primary save">Add Card</a>
+        </div>
     </div>
 </template>
