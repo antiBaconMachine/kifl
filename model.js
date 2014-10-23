@@ -1,4 +1,5 @@
 Cards = new Mongo.Collection("cards");
+Cells = new Mongo.collection("cells");
 
 Cards.allow({
     insert: function (userId, card) {
@@ -25,6 +26,9 @@ createCard = function (options) {
 updateCard = function (options) {
     Meteor.call('updateCard', options);
     return options._id;
+};
+updateCell = function (cellId, cards) {
+    Meteor.call('updateCell', cellId, cards);
 };
 
 var NonEmptyString = Match.Where(function (x) {
@@ -59,7 +63,7 @@ Meteor.methods({
             title: options.title,
             description: options.description,
             col: options.col,
-            color: '#' + Math.floor(Math.random() * 16777215).toString(16)
+            color: '#' + (Math.floor(Math.random() * Math.pow(16,5)) + Math.pow(16, 5)).toString(16)
         });
         return id;
     },
@@ -75,5 +79,16 @@ Meteor.methods({
                 col: options.col
             }
         })
+    },
+    updateCell: function(cellId, orderedCards) {
+        Cell.update({
+            _id: cellId
+        }, {
+            $set: {
+                cards: orderedCards
+            }
+        }, {
+            upsert: true
+        });
     }
 });
