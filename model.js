@@ -80,11 +80,13 @@ Meteor.methods({
             }
         })
     },
-    updateCell: function(cellId, orderedCards) {
-        Cell.update({
-            _id: cellId
+    updateCell: function(cellName, orderedCards) {
+        console.log('update %s to %a',cellName, orderedCards);
+        Cells.update({
+            name: cellName
         }, {
             $set: {
+                name: cellName,
                 cards: orderedCards
             }
         }, {

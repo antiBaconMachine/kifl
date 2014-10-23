@@ -12,7 +12,19 @@ if (Meteor.isClient) {
 //                    color: '#' + Math.floor(Math.random() * 16777215).toString(16)
 //                };
 //            });
-            return Cards.find({"col": col});
+
+            //OMG. Better join and sort pls
+            //http://stackoverflow.com/questions/20375111/mongo-sort-documents-by-array-of-ids
+            //https://www.discovermeteor.com/blog/reactive-joins-in-meteor/
+            //https://jira.mongodb.org/browse/SERVER-7528
+            var ordered;
+            return Cards.find({"_id" : {
+                $in: (function() {
+                    var arr = Cells.find({name: col}).fetch();
+                    ordered = arr.length ? arr[0]["cards"]: [];
+                    return ordered;
+                }())
+            }}).sortBy(function(doc) { return ordered.indexOf(doc._id) });
 
         }
     });
@@ -102,8 +114,9 @@ if (Meteor.isClient) {
             el.classList.remove('over');
             console.log(el.classList);
         });
-    }
+    };
 
+    var dragFrom;
     document.addEventListener('DOMContentLoaded', function () {
         var grid = document.querySelector('.grid');
 
@@ -112,6 +125,7 @@ if (Meteor.isClient) {
             target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text', target.id);
+            dragFrom = getColumn(target);
         }), false);
         grid.addEventListener('dragend', filterEvent('.card', function (e) {
             e.target.classList.remove('dragging');
@@ -145,8 +159,8 @@ if (Meteor.isClient) {
                     dropCol.insertBefore(node, dropRoot);
                 }
                 updateCell(dropCol.id, _.pluck($(dropCol).find('.card'), 'id'));
-                if (dropCol != FROM_COL) {
-                    updateCell(FROM_COL.id, _.pluck($(FROM_COL).find('.card'), 'id'));
+                if (dropCol != dragFrom) {
+                    updateCell(dragFrom.id, _.pluck($(dragFrom).find('.card'), 'id'));
                 }
             }
 
