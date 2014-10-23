@@ -12,7 +12,22 @@ if (Meteor.isClient) {
 //                    color: '#' + Math.floor(Math.random() * 16777215).toString(16)
 //                };
 //            });
-            return Cards.find({"col": col});
+
+            //OMG. Better join and sort pls
+            //http://stackoverflow.com/questions/20375111/mongo-sort-documents-by-array-of-ids
+            //https://www.discovermeteor.com/blog/reactive-joins-in-meteor/
+            //https://jira.mongodb.org/browse/SERVER-7528
+            var order;
+            var cards = Cards.find({"_id" : {
+                $in: (function() {
+                    var arr = Cells.find({name: col}).fetch();
+                    order = arr.length ? arr[0]["cards"]: [];
+                    return order;
+                }())
+            }}).fetch();;
+            return _.sortBy(cards, function(card) {
+                return order.indexOf(card._id);
+            });
 
         }
     });
