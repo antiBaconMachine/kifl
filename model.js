@@ -81,10 +81,11 @@ Meteor.methods({
         })
     },
     updateCell: function(cellId, orderedCards) {
-        Cell.update({
-            _id: cellId
+        Cells.update({
+            name: cellId
         }, {
             $set: {
+                name: cellId,
                 cards: orderedCards
             }
         }, {

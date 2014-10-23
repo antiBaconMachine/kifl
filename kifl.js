@@ -145,9 +145,9 @@ if (Meteor.isClient) {
                     dropCol.insertBefore(node, dropRoot);
                 }
                 updateCell(dropCol.id, _.pluck($(dropCol).find('.card'), 'id'));
-                if (dropCol != FROM_COL) {
-                    updateCell(FROM_COL.id, _.pluck($(FROM_COL).find('.card'), 'id'));
-                }
+//                if (dropCol != FROM_COL) {
+//                    updateCell(FROM_COL.id, _.pluck($(FROM_COL).find('.card'), 'id'));
+//                }
             }
 
             clearDragOverStyles();
