@@ -3,6 +3,14 @@ if (Meteor.isClient) {
     Meteor.subscribe("cards");
 
     Template.column.helpers({
+        cell: function(options) {
+            var cell = Cells.find({name: this.name});
+            //console.log(options, options.hash.name, cell.fetch());
+            return cell;
+        },
+        card: function(id) {
+            return Cards.find({_id: id});
+        },
         cards: function (col) {
 //            return "123".split('').map(function (i) {
 //                var id = Math.ceil(Math.random() * 10000000);
@@ -17,17 +25,17 @@ if (Meteor.isClient) {
             //http://stackoverflow.com/questions/20375111/mongo-sort-documents-by-array-of-ids
             //https://www.discovermeteor.com/blog/reactive-joins-in-meteor/
             //https://jira.mongodb.org/browse/SERVER-7528
-            var ordered;
             return Cards.find({"_id" : {
                 $in: (function() {
                     var arr = Cells.find({name: col}).fetch();
-                    ordered = arr.length ? arr[0]["cards"]: [];
-                    return ordered;
+                    return arr.length ? arr[0]["cards"]: [];
                 }())
-            }}).sortBy(function(doc) { return ordered.indexOf(doc._id) });
+            }});
 
         }
     });
+
+
 
     Template.column.events({
         'click .createCard': function (event, template) {

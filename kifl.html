@@ -16,28 +16,31 @@
 
 <template name="grid">
     <div class="grid">
-        {{>column source='source' id='backlog'}}
-        {{>column id='sprint'}}
-        {{>column id='doing'}}
-        {{>column id='done'}}
+        {{>column source='source' name='backlog'}}
+        {{>column name='sprint'}}
+        {{>column name='doing'}}
+        {{>column name='done'}}
     </div>
 </template>
 
 <template name="column">
-    <div class="grid__column {{source}}" id="{{id}}">
-        <h2>{{id}}</h2>
-        {{#if source}}
+    <div class="grid__column {{source}}" id="{{name}}">
+    {{#if source}}
         <a href="" class="createCard">&oplus;</a>
-        {{/if}}
-        {{#each cards id}}
+    {{/if}}
+    {{#each cell}}
+        <h2>{{name}}</h2>
+        {{cards.length}}
+        {{#each cards}}
             {{>card}}
         {{/each}}
+    {{/each}}
     </div>
 </template>
 
 <template name="card">
     <div class="card" draggable="true" id="{{_id}}" style="background-color: {{color}}">
-        <h3>{{title}}</h3>
+        <h3>{{this}}</h3>
     </div>
 </template>
 
