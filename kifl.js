@@ -117,8 +117,13 @@ if (Meteor.isClient) {
             el.classList.remove('over');
             console.log(el.classList);
         });
-    }
+    };
 
+    var getCardIdsForCol = function(col) {
+        return _.chain($(col).find('.card')).pluck('id').uniq().value();
+    };
+
+    var sourceCol;
     document.addEventListener('DOMContentLoaded', function () {
         var grid = document.querySelector('.grid');
 
@@ -127,6 +132,7 @@ if (Meteor.isClient) {
             target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text', target.id);
+            sourceCol = getColumn(target);
         }), false);
         grid.addEventListener('dragend', filterEvent('.card', function (e) {
             e.target.classList.remove('dragging');
@@ -159,10 +165,10 @@ if (Meteor.isClient) {
                 } else {
                     dropCol.insertBefore(node, dropRoot);
                 }
-                updateCell(dropCol.id, _.pluck($(dropCol).find('.card'), 'id'));
-//                if (dropCol != FROM_COL) {
-//                    updateCell(FROM_COL.id, _.pluck($(FROM_COL).find('.card'), 'id'));
-//                }
+                updateCell(dropCol.id, getCardIdsForCol(dropCol));
+                if (dropCol != sourceCol) {
+                    updateCell(sourceCol.id, getCardIdsForCol(sourceCol));
+                }
             }
 
             clearDragOverStyles();
