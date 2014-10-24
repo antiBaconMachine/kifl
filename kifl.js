@@ -39,11 +39,19 @@ if (Meteor.isClient) {
             openCreateDialog();
             event.preventDefault();
             return false;
+        },
+        'click .card': function(event) {
+            var card = Cards.find({_id : getDropRoot(event.target).id}).fetch()[0];
+            Session.set('editingCard', card);
+            Session.set("createError", null);
+            console.log('currently editing card %o', card);
+            $('#createDialog').modal('show');
         }
     });
 
     /////////////////////////CREATE CARD//////////////////////
     var openCreateDialog = function () {
+        Session.set('editingCard', null);
         Session.set("createError", null);
         $('#createDialog').modal('show');
     };
@@ -80,6 +88,12 @@ if (Meteor.isClient) {
     Template.createDialog.helpers({
         error: function () {
             return Session.get("createError");
+        },
+        editCard: function() {
+            return Session.get("editingCard") || {};
+        },
+        dialogTitle: function() {
+            return Session.get("editingCard") ? 'Edit Card' : 'Add Card';
         }
     });
     //////////////////////////////////

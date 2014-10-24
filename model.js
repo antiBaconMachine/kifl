@@ -36,7 +36,7 @@ var NonEmptyString = Match.Where(function (x) {
     return x.length !== 0;
 });
 
-var validateCard = function(options) {
+var validateCard = function (options) {
     check(options, {
         title: NonEmptyString,
         description: Match.Optional(String),
@@ -57,14 +57,28 @@ Meteor.methods({
     createCard: function (options) {
         validateCard(options);
         var id = options._id || Random.id();
-        Cards.insert({
-            _id: id,
-            owner: this.userId,
-            title: options.title,
-            description: options.description,
-            col: options.col,
-            color: '#' + (Math.floor(Math.random() * Math.pow(16,5)) + Math.pow(16, 5)).toString(16)
-        });
+        Cards.update({
+                _id: id
+            },
+            {
+                $set: {
+                    owner: this.userId,
+                    title: options.title,
+                    description: options.description,
+                    col: options.col,
+                    color: '#' + (Math.floor(Math.random() * Math.pow(16, 5)) + Math.pow(16, 5)).toString(16)
+                }
+            }, {
+                upsert: true
+            });
+        Cells.update({
+                name: options.col
+            },
+            {
+                $push: {
+                    cards: id
+                }
+            });
         return id;
     },
     updateCard: function (options) {
@@ -80,7 +94,7 @@ Meteor.methods({
             }
         })
     },
-    updateCell: function(cellId, orderedCards) {
+    updateCell: function (cellId, orderedCards) {
         Cells.update({
             name: cellId
         }, {

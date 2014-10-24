@@ -47,18 +47,19 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close cancel" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title">Add Card</h4>
+                    <h4 class="modal-title">{{dialogTitle}}</h4>
                 </div>
                 <div class="modal-body">
                     {{#if error}}
                     <div class="alert alert-error">{{error}}</div>
                     {{/if}}
+                    {{#with editCard}}
+                        <label>Title</label>
+                        <input type="text" class="title span5" value="{{title}}">
 
-                    <label>Title</label>
-                    <input type="text" class="title span5">
-
-                    <label>Description</label>
-                    <textarea class="description span5"></textarea>
+                        <label>Description</label>
+                        <textarea class="description span5">{{description}}</textarea>
+                    {{/with}}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default cancel" data-dismiss="modal">Cancel</button>
