@@ -62,10 +62,15 @@ if (Meteor.isClient) {
             var description = template.find(".description").value;
             var existing = Session.get('editingCard') || {};
             if (title.length) {
-                var id = createCard(_.extend(existing, {
-                    title: title,
-                    description: description
-                }));
+                var card = _.extend({
+                        col: 'backlog'
+                    },
+                    existing,
+                    {
+                        title: title,
+                        description: description,
+                    });
+                var id = createCard(card);
                 Session.set("selected", id);
                 closeCreateDialog();
             } else {

@@ -40,7 +40,7 @@ var validateCard = function (options) {
     check(options, {
         title: NonEmptyString,
         description: Match.Optional(String),
-        col: NonEmptyString,
+        col: Match.Optional(NonEmptyString),
         _id: Match.Optional(NonEmptyString),
         color: Match.Optional(NonEmptyString),
         owner: Match.Any
@@ -58,14 +58,17 @@ Meteor.methods({
     // options should include: title, description, x, y, public
     createCard: function (options) {
         console.log('create card ', options);
-        validateCard(options);
+        if (typeof options.owner === undefined) {
+            options.owner = this.userId;
+        }
+        //validateCard(options);
         var id = options._id || Random.id();
         Cards.update({
                 _id: id
             },
             {
                 $set: {
-                    owner: (typeof options.owner === undefined) ? this.userId : options.owner,
+                    owner: options.owner,
                     title: options.title,
                     description: options.description,
                     col: options.col,
