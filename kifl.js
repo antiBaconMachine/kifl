@@ -8,14 +8,8 @@ if (Meteor.isClient) {
             //http://stackoverflow.com/questions/20375111/mongo-sort-documents-by-array-of-ids
             //https://www.discovermeteor.com/blog/reactive-joins-in-meteor/
             //https://jira.mongodb.org/browse/SERVER-7528
-            var order;
-            var cards = Cards.find({"_id" : {
-                $in: (function() {
-                    var arr = Cells.find({name: col}).fetch();
-                    order = arr.length ? arr[0]["cards"]: [];
-                    return order;
-                }())
-            }}).fetch();;
+            var cards = Cards.find({"col" : col}).fetch();
+            var order = Cells.find({name: col}).fetch()[0].cards;
             return _.sortBy(cards, function(card) {
                 return order.indexOf(card._id);
             });
@@ -179,6 +173,10 @@ if (Meteor.isClient) {
                 } else {
                     dropCol.insertBefore(node, dropRoot);
                 }
+                updateCard({
+                    col: dropCol.id,
+                    _id: node.id
+                });
                 updateCell(dropCol.id, getCardIdsForCol(dropCol));
                 if (dropCol != sourceCol) {
                     updateCell(sourceCol.id, getCardIdsForCol(sourceCol));
