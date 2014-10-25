@@ -4,15 +4,6 @@ if (Meteor.isClient) {
 
     Template.column.helpers({
         cards: function (col) {
-//            return "123".split('').map(function (i) {
-//                var id = Math.ceil(Math.random() * 10000000);
-//                return {
-//                    title: i + ' dummy ' + id,
-//                    id: id,
-//                    color: '#' + Math.floor(Math.random() * 16777215).toString(16)
-//                };
-//            });
-
             //OMG. Better join and sort pls
             //http://stackoverflow.com/questions/20375111/mongo-sort-documents-by-array-of-ids
             //https://www.discovermeteor.com/blog/reactive-joins-in-meteor/
@@ -57,7 +48,7 @@ if (Meteor.isClient) {
     };
     var closeCreateDialog = function () {
         $('#createDialog').modal('hide');
-    }
+    };
 
     Template.page.helpers({
         showCreateDialog: function () {
@@ -82,7 +73,12 @@ if (Meteor.isClient) {
                     "It needs a title and a description, or why bother?");
             }
         },
-        'click .cancel': closeCreateDialog
+        'click .delete': function (event, template) {
+            var existing = Session.get('editingCard');
+            if (confirm('Srsly?')) {
+               Meteor.call('deleteCard', existing._id);
+            }
+        }
     });
 
     Template.createDialog.helpers({
@@ -92,8 +88,8 @@ if (Meteor.isClient) {
         editCard: function() {
             return Session.get("editingCard") || {};
         },
-        dialogTitle: function() {
-            return Session.get("editingCard") ? 'Edit Card' : 'Add Card';
+        isEditing: function() {
+            return Session.get("editingCard");
         }
     });
     //////////////////////////////////
@@ -101,7 +97,6 @@ if (Meteor.isClient) {
 
     var filterEvent = function (selector, callback) {
         return function (e) {
-
             if (e.target.matches(selector)) {
                 callback(e);
 //                e.stopPropagation();

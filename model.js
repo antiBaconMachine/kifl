@@ -108,5 +108,8 @@ Meteor.methods({
         }, {
             upsert: true
         });
+    },
+    deleteCard: function (id) {
+        Cards.remove({_id : id});
     }
 });
