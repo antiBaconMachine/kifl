@@ -19,7 +19,7 @@ Cards.allow({
 });
 
 createCard = function (options) {
-    var id = Random.id();
+    var id = options._id || Random.id();
     Meteor.call('createCard', _.extend({ _id: id }, options));
     return id;
 };
@@ -41,7 +41,9 @@ var validateCard = function (options) {
         title: NonEmptyString,
         description: Match.Optional(String),
         col: NonEmptyString,
-        _id: Match.Optional(NonEmptyString)
+        _id: Match.Optional(NonEmptyString),
+        color: Match.Optional(NonEmptyString),
+        owner: Match.Any
     });
 
     //        if (options.title.length > 100)
@@ -55,6 +57,7 @@ var validateCard = function (options) {
 Meteor.methods({
     // options should include: title, description, x, y, public
     createCard: function (options) {
+        console.log('create card ', options);
         validateCard(options);
         var id = options._id || Random.id();
         Cards.update({
@@ -62,11 +65,11 @@ Meteor.methods({
             },
             {
                 $set: {
-                    owner: this.userId,
+                    owner: (typeof options.owner === undefined) ? this.userId : options.owner,
                     title: options.title,
                     description: options.description,
                     col: options.col,
-                    color: '#' + (Math.floor(Math.random() * Math.pow(16, 5)) + Math.pow(16, 5)).toString(16)
+                    color: options.color || '#' + (Math.floor(Math.random() * Math.pow(16, 5)) + Math.pow(16, 5)).toString(16)
                 }
             }, {
                 upsert: true
