@@ -9,18 +9,39 @@
 <template name="page">
     {{> createDialog}}
     <div class="container">
-        {{> grid}}
+        {{>grid getGrid}}
     </div>
 </template>
 
 
 <template name="grid">
-    <div class="grid">
-        {{>column source='source' id='backlog'}}
-        {{>column id='sprint'}}
-        {{>column id='doing'}}
-        {{>column id='done'}}
-    </div>
+    <table class="grid">
+        <thead>
+            <tr id="gridRowHeader" class="grid__row">
+                <th></th>
+                {{#each cols}}
+                    <th class="grid__row__colHeader">{{title}}</th>
+                {{/each}}
+            </tr>
+        </thead>
+        <tbody>
+        {{#each rows}}
+            <tr id="{{_id}}" class="grid__row">
+                <th class="grid__row__rowHeader">{{title}}</th>
+                {{#each ../cols}}
+                    {{#with cell}}
+                        <td id="{{_id}}" class="grid__row__cell">
+                            row: {{row}} col: {{col}}
+                            {{#each cards}}
+                                {{>card}}
+                            {{/each}}
+                        </td>
+                    {{/with}}
+                {{/each}}
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
 </template>
 
 <template name="column">
@@ -36,10 +57,16 @@
 </template>
 
 <template name="card">
-    <div class="card" draggable="true" id="{{_id}}" style="background-color: {{color}}">
-        <h3>{{title}}</h3>
+    <div class="card">
+        <h3>{{this}}</h3>
     </div>
 </template>
+
+<!--<template name="card">-->
+    <!--<div class="card" draggable="true" id="{{_id}}" style="background-color: {{color}}">-->
+        <!--<h3>{{title}}</h3>-->
+    <!--</div>-->
+<!--</template>-->
 
 <template name="createDialog">
     <div class="modal fade" id="createDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

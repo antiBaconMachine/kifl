@@ -2,18 +2,62 @@ if (Meteor.isClient) {
 
     Meteor.subscribe("cards");
 
+    Template.page.helpers({
+        getGrid: function () {
+            return {
+                "_id": "dummy_grid",
+                "rows": [
+                    {"_id": "row1", "title": "row 1"},
+                    {"_id": "row2", "title": "row 2"}
+                ],
+                "cols": [
+                    {"_id": "col1", "title": "col 1"},
+                    {"_id": "col2", "title": "col 2"}
+                ],
+                "cells": {
+                    "row1_col1": {
+                        "row": "row1",
+                        "col": "col1",
+                        "cards": ["foo", "bar"]
+                    },
+                    "row1_col2": {
+                        "row": "row2",
+                        "col": "col2",
+                        "cards": ["spam", "eggs"]
+                    },
+                    "row2_col2": {
+                        "row": "row2",
+                        "col": "col2",
+                        "cards": ["stuff"]
+                    }
+                }
+            };
+        }
+    });
+
+    Template.grid.helpers({
+       cell: function() {
+           var  col = this._id,
+                row = UI._parentData(1)._id,
+                grid = UI._parentData(2),
+                cellId = row + '_' + col
+                cell = grid.cells[cellId] || {_id: cellId, row: row, col: col};
+           console.log("returning cell %o for %o_%o ",cell,row, col);
+           return cell;
+       }
+    });
+
     Template.column.helpers({
         cards: function (col) {
             //OMG. Better join and sort pls
             //http://stackoverflow.com/questions/20375111/mongo-sort-documents-by-array-of-ids
             //https://www.discovermeteor.com/blog/reactive-joins-in-meteor/
             //https://jira.mongodb.org/browse/SERVER-7528
-            var cards = Cards.find({"col" : col}).fetch();
+            var cards = Cards.find({"col": col}).fetch();
             var order = Cells.find({name: col}).fetch()[0].cards;
-            return _.sortBy(cards, function(card) {
+            return _.sortBy(cards, function (card) {
                 return order.indexOf(card._id);
             });
-
         }
     });
 
@@ -25,8 +69,8 @@ if (Meteor.isClient) {
             event.preventDefault();
             return false;
         },
-        'click .card': function(event) {
-            var card = Cards.find({_id : getDropRoot(event.target).id}).fetch()[0];
+        'click .card': function (event) {
+            var card = Cards.find({_id: getDropRoot(event.target).id}).fetch()[0];
             Session.set('editingCard', card);
             Session.set("createError", null);
             console.log('currently editing card %o', card);
@@ -75,7 +119,7 @@ if (Meteor.isClient) {
         'click .delete': function (event, template) {
             var existing = Session.get('editingCard');
             if (confirm('Srsly?')) {
-               Meteor.call('deleteCard', existing._id);
+                Meteor.call('deleteCard', existing._id);
             }
         }
     });
@@ -84,10 +128,10 @@ if (Meteor.isClient) {
         error: function () {
             return Session.get("createError");
         },
-        editCard: function() {
+        editCard: function () {
             return Session.get("editingCard") || {};
         },
-        isEditing: function() {
+        isEditing: function () {
             return Session.get("editingCard");
         }
     });
@@ -120,14 +164,14 @@ if (Meteor.isClient) {
         }
     };
 
-    var clearDragOverStyles = function() {
+    var clearDragOverStyles = function () {
         [].forEach.call(document.querySelectorAll('.over'), function (el) {
             el.classList.remove('over');
             console.log(el.classList);
         });
     };
 
-    var getCardIdsForCol = function(col) {
+    var getCardIdsForCol = function (col) {
         return _.chain($(col).find('.card')).pluck('id').uniq().value();
     };
 
