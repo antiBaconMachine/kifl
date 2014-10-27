@@ -1,5 +1,5 @@
 Cards = new Mongo.Collection("cards");
-Cells = new Mongo.Collection("cells");
+Grids = new Mongo.Collection("grids");
 
 Cards.allow({
     insert: function (userId, card) {

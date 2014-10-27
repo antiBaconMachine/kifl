@@ -4,34 +4,8 @@ if (Meteor.isClient) {
 
     Template.page.helpers({
         getGrid: function () {
-            return {
-                "_id": "dummy_grid",
-                "rows": [
-                    {"_id": "row1", "title": "row 1"},
-                    {"_id": "row2", "title": "row 2"}
-                ],
-                "cols": [
-                    {"_id": "col1", "title": "col 1"},
-                    {"_id": "col2", "title": "col 2"}
-                ],
-                "cells": {
-                    "row1_col1": {
-                        "row": "row1",
-                        "col": "col1",
-                        "cards": ["foo", "bar"]
-                    },
-                    "row1_col2": {
-                        "row": "row2",
-                        "col": "col2",
-                        "cards": ["spam", "eggs"]
-                    },
-                    "row2_col2": {
-                        "row": "row2",
-                        "col": "col2",
-                        "cards": ["stuff"]
-                    }
-                }
-            };
+            //TODO: this should be dynamically fetched from route
+            return Grids.find({_id: 'dummy_grid'}).fetch();
         }
     });
 
