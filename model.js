@@ -31,6 +31,14 @@ updateCell = function (cellId, cards) {
     Meteor.call('updateCell', cellId, cards);
 };
 
+//can either be a row or col
+var createStruct = function(name) {
+    return {
+        title: name,
+        _id: Random.id()
+    };
+}
+
 var NonEmptyString = Match.Where(function (x) {
     check(x, String);
     return x.length !== 0;
@@ -114,5 +122,24 @@ Meteor.methods({
     },
     deleteCard: function (id) {
         Cards.remove({_id : id});
+    },
+    addCol: function(gridId, colName) {
+        Grids.update({
+            _id: gridId
+        },{
+            $push: {
+                cols: createStruct(colName)
+            }
+        })
+    },
+    addRow: function(gridId, rowName) {
+        Grids.update({
+            _id: gridId
+        }, {
+            $push: {
+                rows: createStruct(rowName)
+            }
+        })
     }
+
 });

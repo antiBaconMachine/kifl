@@ -15,6 +15,11 @@
 
 
 <template name="grid">
+    {{#if editing}}
+    <button id="doneEditingGrid">Done</button>
+    {{else}}
+    <button id="editGrid">Edit</button>
+    {{/if}}
     <table class="grid">
         <thead>
             <tr id="gridRowHeader" class="grid__row">
@@ -22,6 +27,15 @@
                 {{#each cols}}
                     <th class="grid__row__colHeader">{{title}}</th>
                 {{/each}}
+                {{#if editing}}
+                    <th class="editing">
+                        {{#if addCol}}
+                            {{>editStructTitle type="addCol"}}
+                        {{else}}
+                        <button id="addCol">Add col</button>
+                        {{/if}}
+                    </th>
+                {{/if}}
             </tr>
         </thead>
         <tbody>
@@ -38,10 +52,24 @@
                         </td>
                     {{/with}}
                 {{/each}}
+                {{#if editing}}
+                <td></td>
+                {{/if}}
             </tr>
         {{/each}}
+        {{#if editing}}
+        <tr>
+            <td collspan="{{cols.length}}">
+                <button id="addRow">Add row</button>
+            </td>
+        </tr>
+        {{/if}}
         </tbody>
     </table>
+</template>
+
+<template name="editStructTitle">
+    <input type="text" class="newStruct" data-operation="{{type}}"/>
 </template>
 
 <template name="column">

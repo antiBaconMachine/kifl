@@ -4,8 +4,9 @@ if (Meteor.isClient) {
 
     Template.page.helpers({
         getGrid: function () {
-            //TODO: this should be dynamically fetched from route
-            return Grids.find({_id: 'dummy_grid'}).fetch();
+            //TODO: this should be dynamically fetched from
+            Session.set('grid', 'dummy_grid');
+            return Grids.find({_id: 'dummy_grid'}).fetch()[0];
         }
     });
 
@@ -14,11 +15,43 @@ if (Meteor.isClient) {
            var  col = this._id,
                 row = UI._parentData(1)._id,
                 grid = UI._parentData(2),
-                cellId = row + '_' + col
+                cellId = row + '_' + col,
                 cell = grid.cells[cellId] || {_id: cellId, row: row, col: col};
            console.log("returning cell %o for %o_%o ",cell,row, col);
            return cell;
+       },
+       editing: function() {
+           return Session.get('editingGrid');
+       },
+       addCol: function() {
+           return Session.get('addCol');
        }
+    });
+
+    Template.grid.events({
+        'click #editGrid': function(event) {
+            event.preventDefault();
+            Session.set('editingGrid', true);
+            return false;
+        },
+        'click #doneEditingGrid': function(event) {
+            event.preventDefault();
+            Session.set('editingGrid', false);
+            return false;
+        },
+        'click #addCol': function(event) {
+            event.preventDefault();
+            Session.set('addCol', true);
+            return false;
+        },
+        'keyup .newStruct': function(e) {
+            if (e.target.value && e.which === 13) {
+                var operation = $(e.target).data('operation');
+                //not safe, validate data
+                Meteor.call(operation, Session.get('grid'), e.target.value);
+                Session.set(operation, false);
+            }
+        }
     });
 
     Template.column.helpers({
