@@ -25,7 +25,7 @@
             <tr id="gridRowHeader" class="grid__row">
                 <th></th>
                 {{#each cols}}
-                    <th class="grid__row__colHeader">{{title}}</th>
+                    <th class="grid__row__colHeader" draggable="{{editing}}">{{title}}</th>
                 {{/each}}
                 {{#if editing}}
                     <th class="editing">
