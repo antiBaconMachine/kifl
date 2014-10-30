@@ -60,7 +60,11 @@
         {{#if editing}}
         <tr>
             <td collspan="{{cols.length}}">
-                <button id="addRow">Add row</button>
+                {{#if addRow}}
+                    {{>editStructTitle type="addRow"}}
+                {{else}}
+                    <button id="addRow">Add row</button>
+                {{/if}}
             </td>
         </tr>
         {{/if}}

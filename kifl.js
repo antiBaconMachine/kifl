@@ -25,6 +25,9 @@ if (Meteor.isClient) {
        },
        addCol: function() {
            return Session.get('addCol');
+       },
+       addRow: function() {
+           return Session.get('addRow');
        }
     });
 
@@ -44,12 +47,18 @@ if (Meteor.isClient) {
             Session.set('addCol', true);
             return false;
         },
+        'click #addRow': function(event) {
+            event.preventDefault();
+            Session.set('addRow', true);
+            return false;
+        },
         'keyup .newStruct': function(e) {
             if (e.target.value && e.which === 13) {
                 var operation = $(e.target).data('operation');
-                //not safe, validate data
-                Meteor.call(operation, Session.get('grid'), e.target.value);
-                Session.set(operation, false);
+                if (operation === 'addRow' || operation === 'addCol') {
+                    Meteor.call(operation, Session.get('grid'), e.target.value);
+                    Session.set(operation, false);
+                }
             }
         }
     });
