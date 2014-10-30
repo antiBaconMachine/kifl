@@ -183,7 +183,7 @@ if (Meteor.isClient) {
     var clearDragOverStyles = function () {
         [].forEach.call(document.querySelectorAll('.over'), function (el) {
             el.classList.remove('over');
-            console.log(el.classList);
+//            console.log(el.classList);
         });
     };
 
@@ -198,8 +198,9 @@ if (Meteor.isClient) {
         grid.on('dragstart', '.card', function (e) {
             var target = e.target;
             target.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text', target.id);
+            var dataTransfer = e.originalEvent.dataTransfer;
+            dataTransfer.effectAllowed = 'move';
+            dataTransfer.setData('text', target.id);
             sourceCol = getColumn(target);
         }).on('dragend','.card', function (e) {
             e.target.classList.remove('dragging');
@@ -217,7 +218,7 @@ if (Meteor.isClient) {
             console.log('drop ', e.dataTransfer.getData('text'), e);
             var dropRoot = getDropRoot(e.target);
             var dropCol = getColumn(dropRoot);
-            var id = e.dataTransfer.getData('text');
+            var id = e.originalEvent.dataTransfer.getData('text');
             var node = document.getElementById(id);
 
             if (dropCol && dropRoot !== node) {
