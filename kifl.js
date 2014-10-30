@@ -132,33 +132,28 @@ if (Meteor.isClient) {
     };
 
     var sourceCol;
-    document.addEventListener('DOMContentLoaded', function () {
-        var grid = document.querySelector('.grid');
+    $(function () {
+        var grid = $('.grid');
 
-        grid.addEventListener('dragstart', filterEvent('.card', function (e) {
+        grid.on('dragstart', '.card', function (e) {
             var target = e.target;
             target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text', target.id);
             sourceCol = getColumn(target);
-        }), false);
-        grid.addEventListener('dragend', filterEvent('.card', function (e) {
+        }).on('dragend','.card', function (e) {
             e.target.classList.remove('dragging');
-        }), false);
-        document.addEventListener('dragenter', filterEvent('.grid__column', function (e) {
+        }).on('dragenter','.card', function (e) {
             //console.log('Drag enter ', e.target);
             clearDragOverStyles();
             e.target.classList.add('over');
-        }), false);
-        grid.addEventListener('dragover', filterEvent('.grid *', function (e) {
+        }).on('dragover', '.grid *', function (e) {
             //console.log('drag over', e.target);
             e.preventDefault();
-        }), false);
-        document.addEventListener('dragenter', filterEvent('body, .container', function (e) {
+        }).on('dragenter', 'body, .container', function (e) {
             console.log('Drag enter doc ', e.target);
             clearDragOverStyles();
-        }), false);
-        grid.addEventListener('drop', filterEvent('.grid *', function (e) {
+        }).on('drop', '.grid *', function (e) {
             console.log('drop ', e.dataTransfer.getData('text'), e);
             var dropRoot = getDropRoot(e.target);
             var dropCol = getColumn(dropRoot);
@@ -187,7 +182,7 @@ if (Meteor.isClient) {
 
             e.stopPropagation();
             e.preventDefault();
-        }), false);
+        });
 
     });
 }
