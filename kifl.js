@@ -163,20 +163,13 @@ if (Meteor.isClient) {
         }
     };
 
-    //todo just jquery everywhere, might as well
-    var getColumn = function (el) {
-        el = $(el);
-        var selector = '.grid__column';
-        if (el.is(selector)) {
-            return el;
-        } else {
-            return el.closest(selector)[0];
-        }
+    var getCell = function (el) {
+        return $(el).closest('.grid__row__cell');
     };
 
     //get the card or column we dropped on
     var getDropRoot = function (el) {
-        return $(el).closest('.card, .grid__column');
+        return $(el).closest('.card, .grid__row__cell');
     };
 
     var clearDragOverStyles = function () {
@@ -200,7 +193,7 @@ if (Meteor.isClient) {
             var dataTransfer = e.originalEvent.dataTransfer;
             dataTransfer.effectAllowed = 'move';
             dataTransfer.setData('text', target.id);
-            sourceCol = getColumn(target);
+            sourceCol = getCell(target);
         }).on('dragend','.card', function (e) {
             e.target.classList.remove('dragging');
         }).on('dragenter', '.card, .grid__row__cell', function (e) {
@@ -216,36 +209,35 @@ if (Meteor.isClient) {
             var id = e.originalEvent.dataTransfer.getData('text');
             console.log('drop id: %s event: ', id, e);
             var dropRoot = getDropRoot(e.target);
-            var dropCol = getColumn(dropRoot);
-            var node = document.getElementById(id);
+            var dropCell = getCell(dropRoot);
+            var node = $('#'+id);
 
-            if (dropCol && dropRoot !== node) {
+            if (dropCell && dropRoot !== node) {
                 node.classList.remove('dragging');
                 node.parentNode.removeChild(node);
-                if (dropRoot == dropCol) {
-                    dropCol.appendChild(node);
+                if (dropRoot == dropCell) {
+                    dropCell.append(node);
                 } else {
-                    dropCol.insertBefore(node, dropRoot);
+                    dropRoot.before(node);
                 }
                 updateCard({
-                    col: dropCol.id,
+                    col: dropCell.id,
                     _id: node.id
                 });
-                updateCell(dropCol.id, getCardIdsForCol(dropCol));
-                if (dropCol != sourceCol) {
+                updateCell(dropCell.id, getCardIdsForCol(dropCell));
+                if (dropCell != sourceCol) {
                     updateCell(sourceCol.id, getCardIdsForCol(sourceCol));
                 }
             }
 
             clearDragOverStyles();
 
-            e.stopPropagation();
-            e.preventDefault();
+            return false;
         });
         $('html').on('dragenter', 'body, .container', function (e) {
 //            console.log('Drag enter doc ', e.target);
             clearDragOverStyles();
-            e.preventDefault();
+            return false;
         });
 
     });
