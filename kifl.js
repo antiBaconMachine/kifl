@@ -17,7 +17,7 @@ if (Meteor.isClient) {
                 grid = UI._parentData(2),
                 cellId = row + '_' + col,
                 cell = grid.cells[cellId] || {_id: cellId, row: row, col: col};
-           console.log("returning cell %o for %o_%o ",cell,row, col);
+//           console.log("returning cell %o for %o_%o ",cell,row, col);
            return cell;
        },
        editing: function() {
@@ -163,21 +163,20 @@ if (Meteor.isClient) {
         }
     };
 
+    //todo just jquery everywhere, might as well
     var getColumn = function (el) {
-        if (el) {
-            return el.matches('.grid__column') ? el : getColumn(el.parentNode);
+        el = $(el);
+        var selector = '.grid__column';
+        if (el.is(selector)) {
+            return el;
         } else {
-            return null;
+            return el.closest(selector)[0];
         }
     };
 
     //get the card or column we dropped on
     var getDropRoot = function (el) {
-        if (el) {
-            return el.matches('.grid__column, .card') ? el : getDropRoot(el.parentNode);
-        } else {
-            return null;
-        }
+        return $(el).closest('.card, .grid__column');
     };
 
     var clearDragOverStyles = function () {
@@ -204,21 +203,20 @@ if (Meteor.isClient) {
             sourceCol = getColumn(target);
         }).on('dragend','.card', function (e) {
             e.target.classList.remove('dragging');
-        }).on('dragenter','.card', function (e) {
-            //console.log('Drag enter ', e.target);
+        }).on('dragenter', '.card, .grid__row__cell', function (e) {
+            console.log('Drag enter ', e.target);
             clearDragOverStyles();
             e.target.classList.add('over');
-        }).on('dragover', '.grid *', function (e) {
+            return false;
+        }).on('dragenter', '.card *', false)
+            .on('dragover', '*', function (e) {
             //console.log('drag over', e.target);
-            e.preventDefault();
-        }).on('dragenter', 'body, .container', function (e) {
-            console.log('Drag enter doc ', e.target);
-            clearDragOverStyles();
-        }).on('drop', '.grid *', function (e) {
-            console.log('drop ', e.dataTransfer.getData('text'), e);
+            return false;
+        }).on('drop', '*', function (e) {
+            var id = e.originalEvent.dataTransfer.getData('text');
+            console.log('drop id: %s event: ', id, e);
             var dropRoot = getDropRoot(e.target);
             var dropCol = getColumn(dropRoot);
-            var id = e.originalEvent.dataTransfer.getData('text');
             var node = document.getElementById(id);
 
             if (dropCol && dropRoot !== node) {
@@ -242,6 +240,11 @@ if (Meteor.isClient) {
             clearDragOverStyles();
 
             e.stopPropagation();
+            e.preventDefault();
+        });
+        $('html').on('dragenter', 'body, .container', function (e) {
+//            console.log('Drag enter doc ', e.target);
+            clearDragOverStyles();
             e.preventDefault();
         });
 
