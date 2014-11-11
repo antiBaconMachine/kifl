@@ -94,6 +94,12 @@ if (Meteor.isClient) {
         }
     });
 
+    Template.card.helpers({
+        card : function() {
+            return Cards.findOne({_id: this.toString()});
+        }
+    });
+
     /////////////////////////CREATE CARD//////////////////////
     var openCreateDialog = function () {
         Session.set('editingCard', null);

@@ -95,9 +95,11 @@
 <!--</template>-->
 
 <template name="card">
+    {{#with card}}
     <div class="card" draggable="true" id="{{_id}}" style="background-color: {{color}}">
         <h3>{{title}}</h3>
     </div>
+    {{/with}}
 </template>
 
 <template name="createDialog">
