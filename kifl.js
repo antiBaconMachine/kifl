@@ -16,8 +16,8 @@ if (Meteor.isClient) {
                 row = UI._parentData(1)._id,
                 grid = UI._parentData(2),
                 cellId = row + '_' + col,
-                cell = grid.cells[cellId] || {_id: cellId, row: row, col: col};
-//           console.log("returning cell %o for %o_%o ",cell,row, col);
+                cell = _.extend({_id: cellId}, grid.cells[cellId]) || {_id: cellId, row: row, col: col};
+           console.log("returning cell %o with id %s for %o_%o ",cell,cell._id,row, col);
            return cell;
        },
        editing: function() {
@@ -189,17 +189,20 @@ if (Meteor.isClient) {
         return _.chain($(cell).find('.card')).pluck('id').uniq().value();
     };
 
-    var sourceCol;
+
     $(function () {
-        var grid = $('.grid');
+        var grid = $('.grid'),
+            sourceCol,
+            sourceNode;
+
 
         grid.on('dragstart', '.card', function (e) {
-            var target = e.target;
-            target.classList.add('dragging');
-            var dataTransfer = e.originalEvent.dataTransfer;
-            dataTransfer.effectAllowed = 'move';
-            dataTransfer.setData('text', target.id);
-            sourceCol = getCell(target);
+            sourceNode = $(e.target);
+            sourceNode.addClass('dragging');
+//            var dataTransfer = e.originalEvent.dataTransfer;
+//            dataTransfer.effectAllowed = 'move';
+//            dataTransfer.setData('text', sourceNode.id);
+            sourceCol = getCell(sourceNode);
         }).on('dragend','.card', function (e) {
             e.target.classList.remove('dragging');
         }).on('dragenter', '.card, .grid__row__cell', function (e) {
@@ -212,29 +215,28 @@ if (Meteor.isClient) {
             //console.log('drag over', e.target);
             return false;
         }).on('drop', '*', function (e) {
-            var id = e.originalEvent.dataTransfer.getData('text');
-            console.log('drop id: %s event: ', id, e);
+//            var id = e.originalEvent.dataTransfer.getData('text');
+            console.log('drop id: %s event: ', sourceNode, e);
             var dropRoot = getDropRoot(e.target);
             var dropCell = getCell(dropRoot);
-            var node = $('#'+id);
 
-            if (dropCell && dropRoot !== node) {
-                node.removeClass('dragging');
-                node.remove();
-                if (dropRoot == dropCell) {
-                    dropCell.append(node);
+            if (dropCell && !dropRoot.is(sourceNode)) {
+                sourceNode.removeClass('dragging');
+                sourceNode.remove();
+                if (dropRoot.is(dropCell)) {
+                    dropCell.append(sourceNode);
                 } else {
-                    dropRoot.before(node);
+                    dropRoot.before(sourceNode);
                 }
-
-                updateCell(Session.get('grid'), dropCell.id, getCardIdsForCell(dropCell));
-                if (dropCell != sourceCol) {
-                    updateCell(Session.get('grid'), sourceCol.id, getCardIdsForCell(sourceCol));
+                var update = {};
+                update[dropCell.attr('id')] = getCardIdsForCell(dropCell);
+                if (!dropCell.is(sourceCol)) {
+                    update[sourceCol.attr('id')] = getCardIdsForCell(sourceCol);
                 }
+                updateCells(Session.get('grid'), update);
             }
 
             clearDragOverStyles();
-
             return false;
         });
         $('html').on('dragenter', 'body, .container', function (e) {

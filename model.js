@@ -27,8 +27,8 @@ updateCard = function (options) {
     Meteor.call('updateCard', options);
     return options._id;
 };
-updateCell = function (gridId, cellId, cards) {
-    Meteor.call('updateCell', gridId, cellId, cards);
+updateCells = function (gridId, cells) {
+    Meteor.call('updateCells', gridId, cells);
 };
 
 //can either be a row or col
@@ -95,9 +95,12 @@ Meteor.methods({
             });
         return id;
     },
-    updateCell: function (gridId, cellId, orderedCards) {
+    updateCells: function (gridId, cells) {
         var updateObj = {};
-        updateObj['cells.' + cellId + '.cards'] = orderedCards;
+        _.each(cells, function(v, k) {
+            updateObj['cells.' + k + '.cards'] = v;
+        });
+        console.log(updateObj);
         Grids.update({_id: gridId}, {$set: updateObj});
     },
     deleteCard: function (id) {
