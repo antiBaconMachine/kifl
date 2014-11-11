@@ -185,8 +185,8 @@ if (Meteor.isClient) {
         });
     };
 
-    var getCardIdsForCol = function (col) {
-        return _.chain($(col).find('.card')).pluck('id').uniq().value();
+    var getCardIdsForCell = function (cell) {
+        return _.chain($(cell).find('.card')).pluck('id').uniq().value();
     };
 
     var sourceCol;
@@ -219,20 +219,17 @@ if (Meteor.isClient) {
             var node = $('#'+id);
 
             if (dropCell && dropRoot !== node) {
-                node.classList.remove('dragging');
-                node.parentNode.removeChild(node);
+                node.removeClass('dragging');
+                node.remove();
                 if (dropRoot == dropCell) {
                     dropCell.append(node);
                 } else {
                     dropRoot.before(node);
                 }
-                updateCard({
-                    col: dropCell.id,
-                    _id: node.id
-                });
-                updateCell(dropCell.id, getCardIdsForCol(dropCell));
+
+                updateCell(Session.get('grid'), dropCell.id, getCardIdsForCell(dropCell));
                 if (dropCell != sourceCol) {
-                    updateCell(sourceCol.id, getCardIdsForCol(sourceCol));
+                    updateCell(Session.get('grid'), sourceCol.id, getCardIdsForCell(sourceCol));
                 }
             }
 

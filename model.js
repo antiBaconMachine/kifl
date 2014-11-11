@@ -27,8 +27,8 @@ updateCard = function (options) {
     Meteor.call('updateCard', options);
     return options._id;
 };
-updateCell = function (cellId, cards) {
-    Meteor.call('updateCell', cellId, cards);
+updateCell = function (gridId, cellId, cards) {
+    Meteor.call('updateCell', gridId, cellId, cards);
 };
 
 //can either be a row or col
@@ -95,30 +95,10 @@ Meteor.methods({
             });
         return id;
     },
-    updateCard: function (options) {
-        var id = options._id;
-        if (!id) {
-            throw new Meteor.Error(406, "Can not update without an id");
-        }
-        Cards.update({
-            _id: id
-        }, {
-            $set: {
-                col: options.col
-            }
-        })
-    },
-    updateCell: function (cellId, orderedCards) {
-        Cells.update({
-            name: cellId
-        }, {
-            $set: {
-                name: cellId,
-                cards: orderedCards
-            }
-        }, {
-            upsert: true
-        });
+    updateCell: function (gridId, cellId, orderedCards) {
+        var updateObj = {};
+        updateObj['cells.' + cellId + '.cards'] = orderedCards;
+        Grids.update({_id: gridId}, {$set: updateObj});
     },
     deleteCard: function (id) {
         Cards.remove({_id : id});
