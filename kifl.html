@@ -20,12 +20,20 @@
     {{else}}
     <button id="editGrid">Edit</button>
     {{/if}}
-    <table class="grid">
+    <table class="grid editing--{{editing}}">
         <thead>
             <tr id="gridRowHeader" class="grid__row">
                 <th></th>
                 {{#each cols}}
-                    <th class="grid__row__colHeader" draggable="{{editing}}">{{title}}</th>
+
+                    <th class="grid__row__colHeader structHeader" id="{{_id}}" draggable="{{editing}}">
+                        {{#if editingStruct}}
+                            {{>editStructTitle title=title type="updateCol"}}
+                        {{else}}
+                            {{title}}
+                        {{/if}}
+                    </th>
+
                 {{/each}}
                 {{#if editing}}
                     <th class="editing">
@@ -40,8 +48,8 @@
         </thead>
         <tbody>
         {{#each rows}}
-            <tr id="{{_id}}" class="grid__row">
-                <th class="grid__row__rowHeader">{{title}}</th>
+            <tr class="grid__row">
+                <th id="{{_id}}" class="grid__row__rowHeader structHeader">{{title}}</th>
                 {{#each ../cols}}
                     {{#with cell}}
                         <td id="{{_id}}" class="grid__row__cell">
@@ -72,7 +80,7 @@
 </template>
 
 <template name="editStructTitle">
-    <input type="text" class="newStruct" data-operation="{{type}}"/>
+    <input type="text" class="newStruct" data-operation="{{type}}" value="{{title}}"/>
 </template>
 
 <template name="column">

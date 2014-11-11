@@ -17,11 +17,16 @@ if (Meteor.isClient) {
                 grid = UI._parentData(2),
                 cellId = row + '_' + col,
                 cell = _.extend({_id: cellId}, grid.cells[cellId]) || {_id: cellId, row: row, col: col};
-           console.log("returning cell %o with id %s for %o_%o ",cell,cell._id,row, col);
+//           console.log("returning cell %o with id %s for %o_%o ",cell,cell._id,row, col);
            return cell;
        },
+       //Are we in general edit mode
        editing: function() {
            return Session.get('editingGrid');
+       },
+       //Are we editing the specific struct in context
+       editingStruct: function() {
+            return Session.get('editingStruct') === this._id;
        },
        addCol: function() {
            return Session.get('addCol');
@@ -40,6 +45,7 @@ if (Meteor.isClient) {
         'click #doneEditingGrid': function(event) {
             event.preventDefault();
             Session.set('editingGrid', false);
+            Session.set('editingStruct', false);
             return false;
         },
         'click #addCol': function(event) {
@@ -54,13 +60,23 @@ if (Meteor.isClient) {
         },
         'keyup .newStruct': function(e) {
             if (e.target.value && e.which === 13) {
-                var operation = $(e.target).data('operation');
-                if (operation === 'addRow' || operation === 'addCol') {
-                    Meteor.call(operation, Session.get('grid'), e.target.value);
+                var $target = $(e.target);
+                var operation = $target.data('operation'),
+                    id = $target.closest('.structHeader').attr('id');
+                console.log(operation, id);
+                if (_.contains(['addRow', 'updateRow', 'addCol', 'updateCol'], operation)) {
+                    Meteor.call(operation, Session.get('grid'), e.target.value, id);
                     Session.set(operation, false);
+                    Session.set('editingStruct', false);
                 }
             }
-        }
+        },
+        'click .editing--true .structHeader': function(e) {
+            console.log('editing struct');
+            var id = e.target.id;
+            Session.set('editingStruct', id);
+        },
+        'click input': false
     });
 
     Template.column.helpers({

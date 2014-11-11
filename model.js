@@ -123,6 +123,9 @@ Meteor.methods({
                 rows: createStruct(rowName)
             }
         })
+    },
+    updateCol: function(gridId, colName, colId) {
+        Grids.update({_id: gridId, cols: {$elemMatch: {_id: colId}}}, {$set: {"cols.$.title": colName}});
     }
 
 });
