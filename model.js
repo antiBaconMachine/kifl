@@ -122,10 +122,16 @@ Meteor.methods({
             $push: {
                 rows: createStruct(rowName)
             }
-        })
+        });
     },
     updateCol: function(gridId, colName, colId) {
         Grids.update({_id: gridId, cols: {$elemMatch: {_id: colId}}}, {$set: {"cols.$.title": colName}});
+    },
+    deleteStruct: function(gridId, structId, isCol) {
+        var type = isCol ? 'cols' : 'rows';
+        var update = {};
+        update[type] = {_id: structId};
+        Grids.update({_id: gridId}, {$pull: update});
     }
 
 });

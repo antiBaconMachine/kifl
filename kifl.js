@@ -76,7 +76,22 @@ if (Meteor.isClient) {
             var id = e.target.id;
             Session.set('editingStruct', id);
         },
-        'click input': false
+        'click input': false,
+        'click .deleteStruct': function(e) {
+            var $target = $(e.target),
+                $structHeader = $target.closest('.structHeader'),
+                structId = $structHeader.attr('id'),
+                isCol = $structHeader.is('.grid__row__colHeader'),
+                gridId = Session.get('grid');
+
+            if ($('.' + structId + ' .card').length) {
+                alert('Can not delete non-empty struct');
+            } else {
+                console.log('deleting struct for grid: %s with id: %s isCol:', gridId, structId, isCol);
+                Meteor.call('deleteStruct', Session.get('grid'), structId, isCol);
+            }
+            return false;
+        }
     });
 
     Template.column.helpers({

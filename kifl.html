@@ -28,7 +28,7 @@
 
                     <th class="grid__row__colHeader structHeader" id="{{_id}}" draggable="{{editing}}">
                         {{#if editingStruct}}
-                            {{>editStructTitle title=title type="updateCol"}}
+                            {{>editStruct title=title type="updateCol"}}
                         {{else}}
                             {{title}}
                         {{/if}}
@@ -38,7 +38,7 @@
                 {{#if editing}}
                     <th class="editing">
                         {{#if addCol}}
-                            {{>editStructTitle type="addCol"}}
+                            {{>editStruct type="addCol"}}
                         {{else}}
                         <button id="addCol">Add col</button>
                         {{/if}}
@@ -52,7 +52,7 @@
                 <th id="{{_id}}" class="grid__row__rowHeader structHeader">{{title}}</th>
                 {{#each ../cols}}
                     {{#with cell}}
-                        <td id="{{_id}}" class="grid__row__cell">
+                        <td id="{{_id}}" class="grid__row__cell {{../_id}}">
                             {{#each cards}}
                                 {{>card}}
                             {{/each}}
@@ -68,7 +68,7 @@
         <tr>
             <td collspan="{{cols.length}}">
                 {{#if addRow}}
-                    {{>editStructTitle type="addRow"}}
+                    {{>editStruct type="addRow"}}
                 {{else}}
                     <button id="addRow">Add row</button>
                 {{/if}}
@@ -79,8 +79,9 @@
     </table>
 </template>
 
-<template name="editStructTitle">
+<template name="editStruct">
     <input type="text" class="newStruct" data-operation="{{type}}" value="{{title}}"/>
+    <a class="deleteStruct">X</a>
 </template>
 
 <template name="column">
