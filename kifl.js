@@ -239,54 +239,54 @@ if (Meteor.isClient) {
             sourceNode;
 
 
-        grid.on('dragstart', '.card', function (e) {
-            sourceNode = $(e.target);
-            sourceNode.addClass('dragging');
-//            var dataTransfer = e.originalEvent.dataTransfer;
-//            dataTransfer.effectAllowed = 'move';
-//            dataTransfer.setData('text', sourceNode.id);
-            sourceCol = getCell(sourceNode);
-        }).on('dragend','.card', function (e) {
-            e.target.classList.remove('dragging');
-        }).on('dragenter', '.card, .grid__row__cell', function (e) {
-            console.log('Drag enter ', e.target);
-            clearDragOverStyles();
-            e.target.classList.add('over');
-            return false;
-        }).on('dragenter', '.card *', false)
-            .on('dragover', '*', function (e) {
-            //console.log('drag over', e.target);
-            return false;
-        }).on('drop', '*', function (e) {
-//            var id = e.originalEvent.dataTransfer.getData('text');
-            console.log('drop id: %s event: ', sourceNode, e);
-            var dropRoot = getDropRoot(e.target);
-            var dropCell = getCell(dropRoot);
-
-            if (dropCell && !dropRoot.is(sourceNode)) {
-                sourceNode.removeClass('dragging');
-                sourceNode.remove();
-                if (dropRoot.is(dropCell)) {
-                    dropCell.append(sourceNode);
-                } else {
-                    dropRoot.before(sourceNode);
-                }
-                var update = {};
-                update[dropCell.attr('id')] = getCardIdsForCell(dropCell);
-                if (!dropCell.is(sourceCol)) {
-                    update[sourceCol.attr('id')] = getCardIdsForCell(sourceCol);
-                }
-                updateCells(Session.get('grid'), update);
-            }
-
-            clearDragOverStyles();
-            return false;
-        });
-        $('html').on('dragenter', 'body, .container', function (e) {
-//            console.log('Drag enter doc ', e.target);
-            clearDragOverStyles();
-            return false;
-        });
+//        grid.on('dragstart', '.card', function (e) {
+//            sourceNode = $(e.target);
+//            sourceNode.addClass('dragging');
+////            var dataTransfer = e.originalEvent.dataTransfer;
+////            dataTransfer.effectAllowed = 'move';
+////            dataTransfer.setData('text', sourceNode.id);
+//            sourceCol = getCell(sourceNode);
+//        }).on('dragend','.card', function (e) {
+//            e.target.classList.remove('dragging');
+//        }).on('dragenter', '.card, .grid__row__cell', function (e) {
+//            console.log('Drag enter ', e.target);
+//            clearDragOverStyles();
+//            e.target.classList.add('over');
+//            return false;
+//        }).on('dragenter', '.card *', false)
+//            .on('dragover', '*', function (e) {
+//            //console.log('drag over', e.target);
+//            return false;
+//        }).on('drop', '*', function (e) {
+////            var id = e.originalEvent.dataTransfer.getData('text');
+//            console.log('drop id: %s event: ', sourceNode, e);
+//            var dropRoot = getDropRoot(e.target);
+//            var dropCell = getCell(dropRoot);
+//
+//            if (dropCell && !dropRoot.is(sourceNode)) {
+//                sourceNode.removeClass('dragging');
+//                sourceNode.remove();
+//                if (dropRoot.is(dropCell)) {
+//                    dropCell.append(sourceNode);
+//                } else {
+//                    dropRoot.before(sourceNode);
+//                }
+//                var update = {};
+//                update[dropCell.attr('id')] = getCardIdsForCell(dropCell);
+//                if (!dropCell.is(sourceCol)) {
+//                    update[sourceCol.attr('id')] = getCardIdsForCell(sourceCol);
+//                }
+//                updateCells(Session.get('grid'), update);
+//            }
+//
+//            clearDragOverStyles();
+//            return false;
+//        });
+//        $('html').on('dragenter', 'body, .container', function (e) {
+////            console.log('Drag enter doc ', e.target);
+//            clearDragOverStyles();
+//            return false;
+//        });
 
     });
 }
