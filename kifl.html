@@ -25,15 +25,7 @@
             <tr id="gridRowHeader" class="grid__row">
                 <th></th>
                 {{#each cols}}
-
-                    <th class="grid__row__colHeader structHeader" id="{{_id}}" draggable="{{editing}}">
-                        {{#if editingStruct}}
-                            {{>editStruct title=title type="updateCol"}}
-                        {{else}}
-                            {{title}}
-                        {{/if}}
-                    </th>
-
+                    <th class="grid__row__colHeader structHeader" id="{{_id}}" draggable="{{editing}}">{{>structHeader}}</th>
                 {{/each}}
                 {{#if editing}}
                     <th class="editing">
@@ -49,7 +41,7 @@
         <tbody>
         {{#each rows}}
             <tr class="grid__row">
-                <th id="{{_id}}" class="grid__row__rowHeader structHeader">{{title}}</th>
+                <th id="{{_id}}" class="grid__row__rowHeader structHeader" draggable="{{editing}}">{{>structHeader}}</th>
                 {{#each ../cols}}
                     {{#with cell}}
                         <td id="{{_id}}" class="grid__row__cell {{../_id}}">
@@ -77,6 +69,14 @@
         {{/if}}
         </tbody>
     </table>
+</template>
+
+<template name="structHeader">
+    {{#if editingStruct}}
+        {{>editStruct title=title type=type}}
+    {{else}}
+        {{title}}
+    {{/if}}
 </template>
 
 <template name="editStruct">

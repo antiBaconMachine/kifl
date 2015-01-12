@@ -20,13 +20,15 @@ if (Meteor.isClient) {
 //           console.log("returning cell %o with id %s for %o_%o ",cell,cell._id,row, col);
            return cell;
        },
+       cols: function() {
+           return _.map(this.cols, function(e) {return _.extend(e, {type: "updateCol"})});
+       },
+       rows: function() {
+           return _.map(this.rows, function(e) {return _.extend(e, {type: "updateRow"})});
+       },
        //Are we in general edit mode
        editing: function() {
            return Session.get('editingGrid');
-       },
-       //Are we editing the specific struct in context
-       editingStruct: function() {
-            return Session.get('editingStruct') === this._id;
        },
        addCol: function() {
            return Session.get('addCol');
@@ -34,6 +36,16 @@ if (Meteor.isClient) {
        addRow: function() {
            return Session.get('addRow');
        }
+    });
+
+    Template.structHeader.helpers({
+        //Are we editing the specific struct in context
+        editingStruct: function() {
+            return Session.get('editingStruct') === this._id;
+        },
+        type: function() {
+            console.log(this);
+        }
     });
 
     Template.grid.events({
