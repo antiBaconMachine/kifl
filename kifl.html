@@ -44,7 +44,7 @@
                 <th id="{{_id}}" class="grid__row__rowHeader structHeader" draggable="{{editing}}">{{>structHeader}}</th>
                 {{#each ../cols}}
                     {{#with cell}}
-                        <td id="{{_id}}" class="grid__row__cell {{../_id}}">
+                        <td id="{{_id}}" class="grid__row__cell {{../_id}} dropzone">
                             {{#each cards}}
                                 {{>card}}
                             {{/each}}
@@ -104,7 +104,7 @@
 
 <template name="card">
     {{#with card}}
-    <div class="card" draggable="true" id="{{_id}}" style="background-color: {{color}}">
+    <div class="card draggable" draggable="true" id="{{_id}}" style="background-color: {{color}}">
         <h3>{{title}}</h3>
     </div>
     {{/with}}
