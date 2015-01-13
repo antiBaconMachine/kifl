@@ -240,6 +240,10 @@ if (Meteor.isClient) {
 
         interact('.draggable')
             .draggable({
+                restrict: {
+                    restriction: "self",
+                    endOnly: true
+                },
                 onstart: function(event) {
                     sourceCol = getCell(event.target);
                 },
@@ -308,6 +312,11 @@ if (Meteor.isClient) {
                 }
             },
             ondropdeactivate: function (event) {
+                //If the target still exists it means it hasn't been moved by ondrop so reset it
+                var x=0, y=0;
+                event.relatedTarget.dataset.x = x;
+                event.relatedTarget.dataset.y = y;
+                event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
                 // remove active dropzone feedback
                 event.target.classList.remove('drop-active');
                 event.target.classList.remove('drop-target');
