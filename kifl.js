@@ -235,12 +235,14 @@ if (Meteor.isClient) {
 
     $(function () {
         var grid = $('.grid'),
-            sourceCol,
-            sourceNode;
+            sourceCol;
 
 
         interact('.draggable')
             .draggable({
+                onstart: function(event) {
+                    sourceCol = getCell(event.target);
+                },
                 onmove: function(event) {
                     var target = event.target,
                     // keep the dragged position in the data-x/data-y attributes
@@ -284,7 +286,26 @@ if (Meteor.isClient) {
                 event.relatedTarget.classList.remove('can-drop');
             },
             ondrop: function (event) {
+                console.log("Drop %o", event);
+                var dropRoot = $(event.target);
+                var dropCell = getCell(dropRoot);
+                var sourceNode = $(event.relatedTarget);
+                //
+                if (dropCell && !dropRoot.is(sourceNode)) {
 
+                    sourceNode.remove();
+                    if (dropRoot.is(dropCell)) {
+                        dropCell.append(sourceNode);
+                    } else {
+                        dropRoot.before(sourceNode);
+                    }
+                    var update = {};
+                    update[dropCell.attr('id')] = getCardIdsForCell(dropCell);
+                    if (!dropCell.is(sourceCol)) {
+                        update[sourceCol.attr('id')] = getCardIdsForCell(sourceCol);
+                    }
+                    updateCells(Session.get('grid'), update);
+                }
             },
             ondropdeactivate: function (event) {
                 // remove active dropzone feedback
