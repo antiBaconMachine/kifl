@@ -100,8 +100,14 @@ Meteor.methods({
         //        }
         //    });
         //TODO: push to correct cell
-        Grids.update({_id: gridId}, {$push : {cards: id}});
-        return id;
+        var grid = Grids.findOne({_id: gridId});
+        if (grid) {
+            var cell1 = [grid.rows[0]._id, grid.cols[0]._id].join("_");
+            var update = {};
+            update["cells." + cell1 + ".cards"] = id;
+            Grids.update({_id: gridId}, {$push: update});
+            return id;
+        }
     },
     updateCells: function (gridId, cells) {
         var updateObj = {};
