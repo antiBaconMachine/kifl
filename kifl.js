@@ -10,67 +10,78 @@ if (Meteor.isClient) {
         }
     });
 
+    var interactable = function (interactWhilstEditing) {
+        return ((Session.get('editingGrid') || false) === interactWhilstEditing) ? "draggable" : "";
+    };
+
     Template.grid.helpers({
-       cell: function() {
-           var  col = this._id,
+        cell: function () {
+            var col = this._id,
                 row = UI._parentData(1)._id,
                 grid = UI._parentData(2),
                 cellId = row + '_' + col,
                 cell = _.extend({_id: cellId}, grid.cells[cellId]) || {_id: cellId, row: row, col: col};
 //           console.log("returning cell %o with id %s for %o_%o ",cell,cell._id,row, col);
-           return cell;
-       },
-       cols: function() {
-           return _.map(this.cols, function(e) {return _.extend(e, {type: "updateCol"})});
-       },
-       rows: function() {
-           return _.map(this.rows, function(e) {return _.extend(e, {type: "updateRow"})});
-       },
-       //Are we in general edit mode
-       editing: function() {
-           return Session.get('editingGrid');
-       },
-       addCol: function() {
-           return Session.get('addCol');
-       },
-       addRow: function() {
-           return Session.get('addRow');
-       }
+            return cell;
+        },
+        cols: function () {
+            return _.map(this.cols, function (e) {
+                return _.extend(e, {type: "updateCol"})
+            });
+        },
+        rows: function () {
+            return _.map(this.rows, function (e) {
+                return _.extend(e, {type: "updateRow"})
+            });
+        },
+        //Are we in general edit mode
+        editing: function () {
+            return Session.get('editingGrid');
+        },
+        addCol: function () {
+            return Session.get('addCol');
+        },
+        addRow: function () {
+            return Session.get('addRow');
+        },
+        interactable: function () {
+            return interactable(true);
+        }
     });
 
     Template.structHeader.helpers({
         //Are we editing the specific struct in context
-        editingStruct: function() {
+        editingStruct: function () {
             return Session.get('editingStruct') === this._id;
         },
-        type: function() {
+        type: function () {
             console.log(this);
         }
     });
 
     Template.grid.events({
-        'click #editGrid': function(event) {
+        'click #editGrid': function (event) {
             event.preventDefault();
             Session.set('editingGrid', true);
             return false;
         },
-        'click #doneEditingGrid': function(event) {
+        'click #doneEditingGrid': function (event) {
             event.preventDefault();
             Session.set('editingGrid', false);
             Session.set('editingStruct', false);
             return false;
         },
-        'click #addCol': function(event) {
+        'click #addCol': function (event) {
             event.preventDefault();
             Session.set('addCol', true);
             return false;
         },
-        'click #addRow': function(event) {
+        'click #addRow': function (event) {
             event.preventDefault();
             Session.set('addRow', true);
             return false;
         },
-        'keyup .newStruct': function(e) {
+        'keyup .newStruct': function (e) {
             if (e.target.value && e.which === 13) {
                 var $target = $(e.target);
                 var operation = $target.data('operation'),
@@ -83,13 +94,13 @@ if (Meteor.isClient) {
                 }
             }
         },
-        'click .editing--true .structHeader': function(e) {
+        'click .editing--true .structHeader': function (e) {
             console.log('editing struct');
             var id = e.target.id;
             Session.set('editingStruct', id);
         },
         'click input': false,
-        'click .deleteStruct': function(e) {
+        'click .deleteStruct': function (e) {
             var $target = $(e.target),
                 $structHeader = $target.closest('.structHeader'),
                 structId = $structHeader.attr('id'),
@@ -138,8 +149,11 @@ if (Meteor.isClient) {
     });
 
     Template.card.helpers({
-        card : function() {
+        card: function () {
             return Cards.findOne({_id: this.toString()});
+        },
+        interactable: function () {
+            return interactable(false);
         }
     });
 
@@ -240,10 +254,10 @@ if (Meteor.isClient) {
 
         interact('.draggable')
             .draggable({
-                onstart: function(event) {
+                onstart: function (event) {
                     sourceCol = getCell(event.target);
                 },
-                onmove: function(event) {
+                onmove: function (event) {
                     var target = event.target,
                     // keep the dragged position in the data-x/data-y attributes
                         x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
@@ -260,27 +274,45 @@ if (Meteor.isClient) {
                 }
             });
 
-        interact('.dropzone').dropzone({
-            overlap: 0.5,
+        var dropHandler = function (extras) {
+            return _.extend(
+                {
+                    //overlap: 0.5,
 
-            // listen for drop related events:
-            ondropactivate: function (event) {
-                // add active dropzone feedback
-                event.target.classList.add('drop-active');
-            },
-            ondragenter: function (event) {
-                var draggableElement = event.relatedTarget,
-                    dropzoneElement = event.target;
+                    // listen for drop related events:
+                    ondropactivate: function (event) {
+                        // add active dropzone feedback
+                        event.target.classList.add('drop-active');
+                    },
+                    ondragenter: function (event) {
+                        var draggableElement = event.relatedTarget,
+                            dropzoneElement = event.target;
 
-                // feedback the possibility of a drop
-                dropzoneElement.classList.add('drop-target');
-                draggableElement.classList.add('can-drop');
-            },
-            ondragleave: function (event) {
-                // remove the drop feedback style
-                event.target.classList.remove('drop-target');
-                event.relatedTarget.classList.remove('can-drop');
-            },
+                        // feedback the possibility of a drop
+                        dropzoneElement.classList.add('drop-target');
+                        draggableElement.classList.add('can-drop');
+                    },
+                    ondragleave: function (event) {
+                        // remove the drop feedback style
+                        event.target.classList.remove('drop-target');
+                        event.relatedTarget.classList.remove('can-drop');
+                    },
+                    ondropdeactivate: function (event) {
+                        //If the target still exists it means it hasn't been moved by ondrop so reset it
+                        var x = 0, y = 0;
+                        event.relatedTarget.dataset.x = x;
+                        event.relatedTarget.dataset.y = y;
+                        event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+                        // remove active dropzone feedback
+                        event.target.classList.remove('drop-active');
+                        event.target.classList.remove('drop-target');
+                    }
+
+                }, (extras || {})
+            );
+        }
+
+        interact('.dropzone-card').dropzone(dropHandler({
             ondrop: function (event) {
                 console.log("Drop %o", event);
                 var dropRoot = $(event.target);
@@ -302,18 +334,8 @@ if (Meteor.isClient) {
                     }
                     updateCells(Session.get('grid'), update);
                 }
-            },
-            ondropdeactivate: function (event) {
-                //If the target still exists it means it hasn't been moved by ondrop so reset it
-                var x=0, y=0;
-                event.relatedTarget.dataset.x = x;
-                event.relatedTarget.dataset.y = y;
-                event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-                // remove active dropzone feedback
-                event.target.classList.remove('drop-active');
-                event.target.classList.remove('drop-target');
             }
-        });
+        }));
 
 //        grid.on('dragstart', '.card', function (e) {
 //            sourceNode = $(e.target);
