@@ -20,7 +20,7 @@ Cards.allow({
 
 createCard = function (gridId, options) {
     var id = options._id || Random.id();
-    Meteor.call('createCard', gridId, _.extend({ _id: id }, options));
+    Meteor.call('createCard', gridId, _.extend({_id: id}, options));
     return id;
 };
 updateCard = function (options) {
@@ -30,15 +30,15 @@ updateCard = function (options) {
 updateCells = function (gridId, cells) {
     Meteor.call('updateCells', gridId, cells);
 };
-sortCols = function(gridId, colIds) {
+sortCols = function (gridId, colIds) {
     return Meteor.call('sortCols', gridId, colIds);
 };
-sortRows = function(gridId, rowIds) {
+sortRows = function (gridId, rowIds) {
     return Meteor.call('sortRows', gridId, rowIds);
 };
 
 //can either be a row or col
-var createStruct = function(name) {
+var createStruct = function (name) {
     return {
         title: name,
         _id: Random.id()
@@ -91,15 +91,6 @@ Meteor.methods({
             }, {
                 upsert: true
             });
-        //Cells.update({
-        //        name: options.col
-        //    },
-        //    {
-        //        $push: {
-        //            cards: id
-        //        }
-        //    });
-        //TODO: push to correct cell
         var grid = Grids.findOne({_id: gridId});
         if (grid) {
             var cell1 = [grid.rows[0]._id, grid.cols[0]._id].join("_");
@@ -111,25 +102,25 @@ Meteor.methods({
     },
     updateCells: function (gridId, cells) {
         var updateObj = {};
-        _.each(cells, function(v, k) {
+        _.each(cells, function (v, k) {
             updateObj['cells.' + k + '.cards'] = v;
         });
         console.log(updateObj);
         Grids.update({_id: gridId}, {$set: updateObj});
     },
     deleteCard: function (id) {
-        Cards.remove({_id : id});
+        Cards.remove({_id: id});
     },
-    addCol: function(gridId, colName) {
+    addCol: function (gridId, colName) {
         Grids.update({
             _id: gridId
-        },{
+        }, {
             $push: {
                 cols: createStruct(colName)
             }
         })
     },
-    addRow: function(gridId, rowName) {
+    addRow: function (gridId, rowName) {
         Grids.update({
             _id: gridId
         }, {
@@ -138,28 +129,28 @@ Meteor.methods({
             }
         });
     },
-    updateCol: function(gridId, colName, colId) {
+    updateCol: function (gridId, colName, colId) {
         Grids.update({_id: gridId, cols: {$elemMatch: {_id: colId}}}, {$set: {"cols.$.title": colName}});
     },
-    sortCols: function(gridId, colIds) {
-        var grid = Grids.findOne({_id : gridId});
+    sortCols: function (gridId, colIds) {
+        var grid = Grids.findOne({_id: gridId});
         if (grid) {
-            var cols = _.sortBy(grid.cols, function(col) {
+            var cols = _.sortBy(grid.cols, function (col) {
                 return colIds.indexOf(col._id);
             });
-            Grids.update({_id : gridId}, {$set: {cols: cols}});
+            Grids.update({_id: gridId}, {$set: {cols: cols}});
         }
     },
-    sortRows: function(gridId, rowIds) {
-        var grid = Grids.findOne({_id : gridId});
+    sortRows: function (gridId, rowIds) {
+        var grid = Grids.findOne({_id: gridId});
         if (grid) {
-            var rows = _.sortBy(grid.rows, function(row) {
+            var rows = _.sortBy(grid.rows, function (row) {
                 return rowIds.indexOf(row._id);
             });
-            Grids.update({_id : gridId}, {$set: {rows: rows}});
+            Grids.update({_id: gridId}, {$set: {rows: rows}});
         }
     },
-    deleteStruct: function(gridId, structId, isCol) {
+    deleteStruct: function (gridId, structId, isCol) {
         var type = isCol ? 'cols' : 'rows';
         var update = {};
         update[type] = {_id: structId};
