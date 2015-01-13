@@ -240,10 +240,6 @@ if (Meteor.isClient) {
 
         interact('.draggable')
             .draggable({
-                restrict: {
-                    restriction: "self",
-                    endOnly: true
-                },
                 onstart: function(event) {
                     sourceCol = getCell(event.target);
                 },
@@ -261,14 +257,10 @@ if (Meteor.isClient) {
                     // update the posiion attributes
                     target.setAttribute('data-x', x);
                     target.setAttribute('data-y', y);
-                },
-                onend: function() {
-
                 }
             });
 
         interact('.dropzone').dropzone({
-            // Require a 75% element overlap for a drop to be possible
             overlap: 0.5,
 
             // listen for drop related events:
