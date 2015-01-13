@@ -332,15 +332,27 @@ if (Meteor.isClient) {
                 if (moveCell != dropCell) {
                     moveCell.remove();
                     dropCell.before(moveCell);
-                    var colIds = _.pluck($(".grid__row__colHeader"), "id");
-                    sortCols(Session.get('grid'), colIds);
+                    var structIds = _.pluck($(".grid__row__colHeader"), "id");
+                    sortCols(Session.get('grid'), structIds);
                 }
             }
         }));
 
+        interact('.dropzone-row').dropzone(dropHandler({
+            accept: '.grid__row__rowHeader',
+            ondrop: function (event) {
+                var moveRow = $(event.relatedTarget).closest('tr'),
+                    dropRow = $(event.target).closest('tr');
+                if (moveRow != dropRow) {
+                    moveRow.remove();
+                    dropRow.before(moveRow);
+                    var structIds = _.pluck($(".grid__row__rowHeader"), "id");
+                    sortRows(Session.get('grid'), structIds);
+                }
+            }
+        }));
     });
 }
-
 
 if (Meteor.isServer) {
     Meteor.startup(function () {

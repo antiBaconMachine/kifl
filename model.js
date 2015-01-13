@@ -33,6 +33,9 @@ updateCells = function (gridId, cells) {
 sortCols = function(gridId, colIds) {
     return Meteor.call('sortCols', gridId, colIds);
 };
+sortRows = function(gridId, rowIds) {
+    return Meteor.call('sortRows', gridId, rowIds);
+};
 
 //can either be a row or col
 var createStruct = function(name) {
@@ -137,6 +140,15 @@ Meteor.methods({
                 return colIds.indexOf(col._id);
             });
             Grids.update({_id : gridId}, {$set: {cols: cols}});
+        }
+    },
+    sortRows: function(gridId, rowIds) {
+        var grid = Grids.findOne({_id : gridId});
+        if (grid) {
+            var rows = _.sortBy(grid.rows, function(row) {
+                return rowIds.indexOf(row._id);
+            });
+            Grids.update({_id : gridId}, {$set: {rows: rows}});
         }
     },
     deleteStruct: function(gridId, structId, isCol) {
