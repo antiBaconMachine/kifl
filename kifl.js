@@ -10,67 +10,78 @@ if (Meteor.isClient) {
         }
     });
 
+    var interactable = function (interactWhilstEditing) {
+        return ((Session.get('editingGrid') || false) === interactWhilstEditing) ? "draggable" : "";
+    };
+
     Template.grid.helpers({
-       cell: function() {
-           var  col = this._id,
+        cell: function () {
+            var col = this._id,
                 row = UI._parentData(1)._id,
                 grid = UI._parentData(2),
                 cellId = row + '_' + col,
                 cell = _.extend({_id: cellId}, grid.cells[cellId]) || {_id: cellId, row: row, col: col};
 //           console.log("returning cell %o with id %s for %o_%o ",cell,cell._id,row, col);
-           return cell;
-       },
-       cols: function() {
-           return _.map(this.cols, function(e) {return _.extend(e, {type: "updateCol"})});
-       },
-       rows: function() {
-           return _.map(this.rows, function(e) {return _.extend(e, {type: "updateRow"})});
-       },
-       //Are we in general edit mode
-       editing: function() {
-           return Session.get('editingGrid');
-       },
-       addCol: function() {
-           return Session.get('addCol');
-       },
-       addRow: function() {
-           return Session.get('addRow');
-       }
+            return cell;
+        },
+        cols: function () {
+            return _.map(this.cols, function (e) {
+                return _.extend(e, {type: "updateCol"})
+            });
+        },
+        rows: function () {
+            return _.map(this.rows, function (e) {
+                return _.extend(e, {type: "updateRow"})
+            });
+        },
+        //Are we in general edit mode
+        editing: function () {
+            return Session.get('editingGrid');
+        },
+        addCol: function () {
+            return Session.get('addCol');
+        },
+        addRow: function () {
+            return Session.get('addRow');
+        },
+        interactable: function () {
+            return interactable(true);
+        }
     });
 
     Template.structHeader.helpers({
         //Are we editing the specific struct in context
-        editingStruct: function() {
+        editingStruct: function () {
             return Session.get('editingStruct') === this._id;
         },
-        type: function() {
+        type: function () {
             console.log(this);
         }
     });
 
     Template.grid.events({
-        'click #editGrid': function(event) {
+        'click #editGrid': function (event) {
             event.preventDefault();
             Session.set('editingGrid', true);
             return false;
         },
-        'click #doneEditingGrid': function(event) {
+        'click #doneEditingGrid': function (event) {
             event.preventDefault();
             Session.set('editingGrid', false);
             Session.set('editingStruct', false);
             return false;
         },
-        'click #addCol': function(event) {
+        'click #addCol': function (event) {
             event.preventDefault();
             Session.set('addCol', true);
             return false;
         },
-        'click #addRow': function(event) {
+        'click #addRow': function (event) {
             event.preventDefault();
             Session.set('addRow', true);
             return false;
         },
-        'keyup .newStruct': function(e) {
+        'keyup .newStruct': function (e) {
             if (e.target.value && e.which === 13) {
                 var $target = $(e.target);
                 var operation = $target.data('operation'),
@@ -83,13 +94,13 @@ if (Meteor.isClient) {
                 }
             }
         },
-        'click .editing--true .structHeader': function(e) {
+        'click .editing--true .structHeader': function (e) {
             console.log('editing struct');
             var id = e.target.id;
             Session.set('editingStruct', id);
         },
         'click input': false,
-        'click .deleteStruct': function(e) {
+        'click .deleteStruct': function (e) {
             var $target = $(e.target),
                 $structHeader = $target.closest('.structHeader'),
                 structId = $structHeader.attr('id'),
@@ -103,20 +114,6 @@ if (Meteor.isClient) {
                 Meteor.call('deleteStruct', Session.get('grid'), structId, isCol);
             }
             return false;
-        }
-    });
-
-    Template.column.helpers({
-        cards: function (col) {
-            //OMG. Better join and sort pls
-            //http://stackoverflow.com/questions/20375111/mongo-sort-documents-by-array-of-ids
-            //https://www.discovermeteor.com/blog/reactive-joins-in-meteor/
-            //https://jira.mongodb.org/browse/SERVER-7528
-            var cards = Cards.find({"col": col}).fetch();
-            var order = Cells.find({name: col}).fetch()[0].cards;
-            return _.sortBy(cards, function (card) {
-                return order.indexOf(card._id);
-            });
         }
     });
 
@@ -138,8 +135,11 @@ if (Meteor.isClient) {
     });
 
     Template.card.helpers({
-        card : function() {
+        card: function () {
             return Cards.findOne({_id: this.toString()});
+        },
+        interactable: function () {
+            return interactable(false);
         }
     });
 
@@ -235,62 +235,124 @@ if (Meteor.isClient) {
 
     $(function () {
         var grid = $('.grid'),
-            sourceCol,
-            sourceNode;
+            sourceCol;
 
 
-        grid.on('dragstart', '.card', function (e) {
-            sourceNode = $(e.target);
-            sourceNode.addClass('dragging');
-//            var dataTransfer = e.originalEvent.dataTransfer;
-//            dataTransfer.effectAllowed = 'move';
-//            dataTransfer.setData('text', sourceNode.id);
-            sourceCol = getCell(sourceNode);
-        }).on('dragend','.card', function (e) {
-            e.target.classList.remove('dragging');
-        }).on('dragenter', '.card, .grid__row__cell', function (e) {
-            console.log('Drag enter ', e.target);
-            clearDragOverStyles();
-            e.target.classList.add('over');
-            return false;
-        }).on('dragenter', '.card *', false)
-            .on('dragover', '*', function (e) {
-            //console.log('drag over', e.target);
-            return false;
-        }).on('drop', '*', function (e) {
-//            var id = e.originalEvent.dataTransfer.getData('text');
-            console.log('drop id: %s event: ', sourceNode, e);
-            var dropRoot = getDropRoot(e.target);
-            var dropCell = getCell(dropRoot);
+        interact('.draggable')
+            .draggable({
+                onstart: function (event) {
+                    sourceCol = getCell(event.target);
+                },
+                onmove: function (event) {
+                    var target = event.target,
+                    // keep the dragged position in the data-x/data-y attributes
+                        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+                        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
-            if (dropCell && !dropRoot.is(sourceNode)) {
-                sourceNode.removeClass('dragging');
-                sourceNode.remove();
-                if (dropRoot.is(dropCell)) {
-                    dropCell.append(sourceNode);
-                } else {
-                    dropRoot.before(sourceNode);
+                    // translate the element
+                    target.style.webkitTransform =
+                        target.style.transform =
+                            'translate(' + x + 'px, ' + y + 'px)';
+
+                    // update the posiion attributes
+                    target.setAttribute('data-x', x);
+                    target.setAttribute('data-y', y);
                 }
-                var update = {};
-                update[dropCell.attr('id')] = getCardIdsForCell(dropCell);
-                if (!dropCell.is(sourceCol)) {
-                    update[sourceCol.attr('id')] = getCardIdsForCell(sourceCol);
+            });
+
+        var dropHandler = function (extras) {
+            return _.extend(
+                {
+                    //overlap: 0.5,
+
+                    // listen for drop related events:
+                    ondropactivate: function (event) {
+                        // add active dropzone feedback
+                        event.target.classList.add('drop-active');
+                    },
+                    ondragenter: function (event) {
+                        var draggableElement = event.relatedTarget,
+                            dropzoneElement = event.target;
+
+                        // feedback the possibility of a drop
+                        dropzoneElement.classList.add('drop-target');
+                        draggableElement.classList.add('can-drop');
+                    },
+                    ondragleave: function (event) {
+                        // remove the drop feedback style
+                        event.target.classList.remove('drop-target');
+                        event.relatedTarget.classList.remove('can-drop');
+                    },
+                    ondropdeactivate: function (event) {
+                        //If the target still exists it means it hasn't been moved by ondrop so reset it
+                        var x = 0, y = 0;
+                        event.relatedTarget.dataset.x = x;
+                        event.relatedTarget.dataset.y = y;
+                        event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+                        // remove active dropzone feedback
+                        event.target.classList.remove('drop-active');
+                        event.target.classList.remove('drop-target');
+                    }
+
+                }, (extras || {})
+            );
+        }
+
+        interact('.dropzone-card').dropzone(dropHandler({
+            accept: '.card',
+            ondrop: function (event) {
+                console.log("Drop %o", event);
+                var dropRoot = $(event.target);
+                var dropCell = getCell(dropRoot);
+                var sourceNode = $(event.relatedTarget);
+                //
+                if (dropCell && !dropRoot.is(sourceNode)) {
+
+                    sourceNode.remove();
+                    if (dropRoot.is(dropCell)) {
+                        dropCell.append(sourceNode);
+                    } else {
+                        dropRoot.before(sourceNode);
+                    }
+                    var update = {};
+                    update[dropCell.attr('id')] = getCardIdsForCell(dropCell);
+                    if (!dropCell.is(sourceCol)) {
+                        update[sourceCol.attr('id')] = getCardIdsForCell(sourceCol);
+                    }
+                    updateCells(Session.get('grid'), update);
                 }
-                updateCells(Session.get('grid'), update);
             }
+        }));
 
-            clearDragOverStyles();
-            return false;
-        });
-        $('html').on('dragenter', 'body, .container', function (e) {
-//            console.log('Drag enter doc ', e.target);
-            clearDragOverStyles();
-            return false;
-        });
+        interact('.dropzone-col').dropzone(dropHandler({
+            accept: '.grid__row__colHeader',
+            ondrop: function (event) {
+                var moveCell = $(event.relatedTarget),
+                    dropCell = $(event.target);
+                if (moveCell != dropCell) {
+                    moveCell.remove();
+                    dropCell.before(moveCell);
+                    var structIds = _.pluck($(".grid__row__colHeader"), "id");
+                    sortCols(Session.get('grid'), structIds);
+                }
+            }
+        }));
 
+        interact('.dropzone-row').dropzone(dropHandler({
+            accept: '.grid__row__rowHeader',
+            ondrop: function (event) {
+                var moveRow = $(event.relatedTarget).closest('tr'),
+                    dropRow = $(event.target).closest('tr');
+                if (moveRow != dropRow) {
+                    moveRow.remove();
+                    dropRow.before(moveRow);
+                    var structIds = _.pluck($(".grid__row__rowHeader"), "id");
+                    sortRows(Session.get('grid'), structIds);
+                }
+            }
+        }));
     });
 }
-
 
 if (Meteor.isServer) {
     Meteor.startup(function () {

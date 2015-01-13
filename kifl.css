@@ -45,7 +45,7 @@ html, body {
     padding: 5px;
 }
 
-.over {
+.drop-target {
     background: lightblue;
 }
 .dragging {

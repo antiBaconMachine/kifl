@@ -25,7 +25,7 @@
             <tr id="gridRowHeader" class="grid__row">
                 <th></th>
                 {{#each cols}}
-                    <th class="grid__row__colHeader structHeader" id="{{_id}}" draggable="{{editing}}">{{>structHeader}}</th>
+                    <th class="grid__row__colHeader structHeader {{interactable}} dropzone-col" id="{{_id}}">{{>structHeader}}</th>
                 {{/each}}
                 {{#if editing}}
                     <th class="editing">
@@ -41,10 +41,10 @@
         <tbody>
         {{#each rows}}
             <tr class="grid__row">
-                <th id="{{_id}}" class="grid__row__rowHeader structHeader" draggable="{{editing}}">{{>structHeader}}</th>
+                <th id="{{_id}}" class="grid__row__rowHeader structHeader {{interactable}} dropzone-row">{{>structHeader}}</th>
                 {{#each ../cols}}
                     {{#with cell}}
-                        <td id="{{_id}}" class="grid__row__cell {{../_id}}">
+                        <td id="{{_id}}" class="grid__row__cell {{../_id}} dropzone-card">
                             {{#each cards}}
                                 {{>card}}
                             {{/each}}
@@ -104,7 +104,7 @@
 
 <template name="card">
     {{#with card}}
-    <div class="card" draggable="true" id="{{_id}}" style="background-color: {{color}}">
+    <div class="card {{interactable}} dropzone-card" id="{{_id}}" style="background-color: {{color}}">
         <h3>{{title}}</h3>
     </div>
     {{/with}}
