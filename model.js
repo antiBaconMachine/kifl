@@ -30,6 +30,9 @@ updateCard = function (options) {
 updateCells = function (gridId, cells) {
     Meteor.call('updateCells', gridId, cells);
 };
+sortCols = function(gridId, colIds) {
+    return Meteor.call('sortCols', gridId, colIds);
+};
 
 //can either be a row or col
 var createStruct = function(name) {
@@ -126,6 +129,15 @@ Meteor.methods({
     },
     updateCol: function(gridId, colName, colId) {
         Grids.update({_id: gridId, cols: {$elemMatch: {_id: colId}}}, {$set: {"cols.$.title": colName}});
+    },
+    sortCols: function(gridId, colIds) {
+        var grid = Grids.findOne({_id : gridId});
+        if (grid) {
+            var cols = _.sortBy(grid.cols, function(col) {
+                return colIds.indexOf(col._id);
+            });
+            Grids.update({_id : gridId}, {$set: {cols: cols}});
+        }
     },
     deleteStruct: function(gridId, structId, isCol) {
         var type = isCol ? 'cols' : 'rows';

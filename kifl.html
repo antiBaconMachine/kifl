@@ -25,7 +25,7 @@
             <tr id="gridRowHeader" class="grid__row">
                 <th></th>
                 {{#each cols}}
-                    <th class="grid__row__colHeader structHeader {{interactable}}" id="{{_id}}">{{>structHeader}}</th>
+                    <th class="grid__row__colHeader structHeader {{interactable}} dropzone-col" id="{{_id}}">{{>structHeader}}</th>
                 {{/each}}
                 {{#if editing}}
                     <th class="editing">
@@ -41,7 +41,7 @@
         <tbody>
         {{#each rows}}
             <tr class="grid__row">
-                <th id="{{_id}}" class="grid__row__rowHeader structHeader {{interactable}}">{{>structHeader}}</th>
+                <th id="{{_id}}" class="grid__row__rowHeader structHeader {{interactable}} dropzone-row">{{>structHeader}}</th>
                 {{#each ../cols}}
                     {{#with cell}}
                         <td id="{{_id}}" class="grid__row__cell {{../_id}} dropzone-card">

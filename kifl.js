@@ -117,20 +117,6 @@ if (Meteor.isClient) {
         }
     });
 
-    Template.column.helpers({
-        cards: function (col) {
-            //OMG. Better join and sort pls
-            //http://stackoverflow.com/questions/20375111/mongo-sort-documents-by-array-of-ids
-            //https://www.discovermeteor.com/blog/reactive-joins-in-meteor/
-            //https://jira.mongodb.org/browse/SERVER-7528
-            var cards = Cards.find({"col": col}).fetch();
-            var order = Cells.find({name: col}).fetch()[0].cards;
-            return _.sortBy(cards, function (card) {
-                return order.indexOf(card._id);
-            });
-        }
-    });
-
     Template.column.events({
         'click .createCard': function (event, template) {
 //            if (! Meteor.userId()) // must be logged in to create events
@@ -313,6 +299,7 @@ if (Meteor.isClient) {
         }
 
         interact('.dropzone-card').dropzone(dropHandler({
+            accept: '.card',
             ondrop: function (event) {
                 console.log("Drop %o", event);
                 var dropRoot = $(event.target);
@@ -337,54 +324,19 @@ if (Meteor.isClient) {
             }
         }));
 
-//        grid.on('dragstart', '.card', function (e) {
-//            sourceNode = $(e.target);
-//            sourceNode.addClass('dragging');
-////            var dataTransfer = e.originalEvent.dataTransfer;
-////            dataTransfer.effectAllowed = 'move';
-////            dataTransfer.setData('text', sourceNode.id);
-//            sourceCol = getCell(sourceNode);
-//        }).on('dragend','.card', function (e) {
-//            e.target.classList.remove('dragging');
-//        }).on('dragenter', '.card, .grid__row__cell', function (e) {
-//            console.log('Drag enter ', e.target);
-//            clearDragOverStyles();
-//            e.target.classList.add('over');
-//            return false;
-//        }).on('dragenter', '.card *', false)
-//            .on('dragover', '*', function (e) {
-//            //console.log('drag over', e.target);
-//            return false;
-//        }).on('drop', '*', function (e) {
-////            var id = e.originalEvent.dataTransfer.getData('text');
-//            console.log('drop id: %s event: ', sourceNode, e);
-//            var dropRoot = getDropRoot(e.target);
-//            var dropCell = getCell(dropRoot);
-//
-//            if (dropCell && !dropRoot.is(sourceNode)) {
-//                sourceNode.removeClass('dragging');
-//                sourceNode.remove();
-//                if (dropRoot.is(dropCell)) {
-//                    dropCell.append(sourceNode);
-//                } else {
-//                    dropRoot.before(sourceNode);
-//                }
-//                var update = {};
-//                update[dropCell.attr('id')] = getCardIdsForCell(dropCell);
-//                if (!dropCell.is(sourceCol)) {
-//                    update[sourceCol.attr('id')] = getCardIdsForCell(sourceCol);
-//                }
-//                updateCells(Session.get('grid'), update);
-//            }
-//
-//            clearDragOverStyles();
-//            return false;
-//        });
-//        $('html').on('dragenter', 'body, .container', function (e) {
-////            console.log('Drag enter doc ', e.target);
-//            clearDragOverStyles();
-//            return false;
-//        });
+        interact('.dropzone-col').dropzone(dropHandler({
+            accept: '.grid__row__colHeader',
+            ondrop: function (event) {
+                var moveCell = $(event.relatedTarget),
+                    dropCell = $(event.target);
+                if (moveCell != dropCell) {
+                    moveCell.remove();
+                    dropCell.before(moveCell);
+                    var colIds = _.pluck($(".grid__row__colHeader"), "id");
+                    sortCols(Session.get('grid'), colIds);
+                }
+            }
+        }));
 
     });
 }
