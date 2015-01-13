@@ -18,9 +18,9 @@ Cards.allow({
     }
 });
 
-createCard = function (options) {
+createCard = function (gridId, options) {
     var id = options._id || Random.id();
-    Meteor.call('createCard', _.extend({ _id: id }, options));
+    Meteor.call('createCard', gridId, _.extend({ _id: id }, options));
     return id;
 };
 updateCard = function (options) {
@@ -70,7 +70,7 @@ var validateCard = function (options) {
 
 Meteor.methods({
     // options should include: title, description, x, y, public
-    createCard: function (options) {
+    createCard: function (gridId, options) {
         console.log('create card ', options);
         if (typeof options.owner === undefined) {
             options.owner = this.userId;
@@ -91,14 +91,16 @@ Meteor.methods({
             }, {
                 upsert: true
             });
-        Cells.update({
-                name: options.col
-            },
-            {
-                $push: {
-                    cards: id
-                }
-            });
+        //Cells.update({
+        //        name: options.col
+        //    },
+        //    {
+        //        $push: {
+        //            cards: id
+        //        }
+        //    });
+        //TODO: push to correct cell
+        Grids.update({_id: gridId}, {$push : {cards: id}});
         return id;
     },
     updateCells: function (gridId, cells) {

@@ -30,17 +30,10 @@ table td, table td * {
     border-width: 0 1px 0 0;
 }
 
-.grid__column {
-    border: 1px solid black;
+.grid td {
     width: 300px;
-    float: left;
-    overflow: auto;
-    height: 100%;
-    position: relative;
-    padding-top: 40px;
+    max-height: 450px;
 }
-
-
 
 .card {
     background-color: yellow;

@@ -114,10 +114,7 @@ if (Meteor.isClient) {
                 Meteor.call('deleteStruct', Session.get('grid'), structId, isCol);
             }
             return false;
-        }
-    });
-
-    Template.column.events({
+        },
         'click .createCard': function (event, template) {
 //            if (! Meteor.userId()) // must be logged in to create events
 //                return;
@@ -173,7 +170,7 @@ if (Meteor.isClient) {
                         title: title,
                         description: description,
                     });
-                var id = createCard(card);
+                var id = createCard(Session.get('grid'), card);
                 Session.set("selected", id);
                 closeCreateDialog();
             } else {
