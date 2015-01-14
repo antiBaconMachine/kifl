@@ -99,7 +99,9 @@ if (Meteor.isClient) {
             var id = e.target.id;
             Session.set('editingStruct', id);
         },
-        'click input': false,
+        'click input': function() {
+            return false;
+        },
         'click .deleteStruct': function (e) {
             var $target = $(e.target),
                 $structHeader = $target.closest('.structHeader'),
