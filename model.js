@@ -18,10 +18,9 @@ Cards.allow({
     }
 });
 
-createCard = function (gridId, options) {
-    var id = options._id || Random.id();
-    Meteor.call('createCard', gridId, _.extend({_id: id}, options));
-    return id;
+createCard = function (gridId, card) {
+    card._id = card._id || Random.id();
+    return Meteor.call('createCard', gridId, card);
 };
 updateCard = function (options) {
     Meteor.call('updateCard', options);
@@ -70,29 +69,31 @@ var validateCard = function (options) {
 
 Meteor.methods({
     // options should include: title, description, x, y, public
-    createCard: function (gridId, options) {
-        console.log('create card ', options);
-        if (typeof options.owner === undefined) {
-            options.owner = this.userId;
+    createCard: function (gridId, card) {
+        console.log('create card ', card);
+        if (typeof card.owner === "undefined") {
+            card.owner = this.userId;
         }
         //validateCard(options);
-        var id = options._id || Random.id();
+        var id = card._id || Random.id();
+        console.log("upsert id %s", id);
+        var existing = Cards.findOne({_id: id});
         Cards.update({
                 _id: id
             },
             {
                 $set: {
-                    owner: options.owner,
-                    title: options.title,
-                    description: options.description,
-                    col: options.col,
-                    color: options.color || '#' + (Math.floor(Math.random() * Math.pow(16, 5)) + Math.pow(16, 5)).toString(16)
+                    owner: card.owner,
+                    title: card.title,
+                    description: card.description,
+                    col: card.col,
+                    color: card.color || '#' + (Math.floor(Math.random() * Math.pow(16, 5)) + Math.pow(16, 5)).toString(16)
                 }
             }, {
                 upsert: true
             });
         var grid = Grids.findOne({_id: gridId});
-        if (grid) {
+        if (!existing && grid) {
             var cell1 = [grid.rows[0]._id, grid.cols[0]._id].join("_");
             var update = {};
             update["cells." + cell1 + ".cards"] = id;

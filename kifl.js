@@ -123,11 +123,13 @@ if (Meteor.isClient) {
             return false;
         },
         'click .card': function (event) {
-            var card = Cards.find({_id: getDropRoot(event.target).id}).fetch()[0];
-            Session.set('editingCard', card);
-            Session.set("createError", null);
-            console.log('currently editing card %o', card);
-            $('#createDialog').modal('show');
+            var card = Cards.findOne({_id: getDropRoot(event.target).attr("id")});
+            if (card) {
+                Session.set('editingCard', card);
+                Session.set("createError", null);
+                console.log('currently editing card %o', card);
+                $('#createDialog').modal('show');
+            }
         }
     });
 
@@ -162,10 +164,7 @@ if (Meteor.isClient) {
             var description = template.find(".description").value;
             var existing = Session.get('editingCard') || {};
             if (title.length) {
-                var card = _.extend({
-                        col: 'backlog'
-                    },
-                    existing,
+                var card = _.extend(existing,
                     {
                         title: title,
                         description: description,
