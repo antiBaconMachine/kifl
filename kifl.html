@@ -9,36 +9,96 @@
 <template name="page">
     {{> createDialog}}
     <div class="container">
-        {{> grid}}
+        {{>grid getGrid}}
     </div>
 </template>
 
 
 <template name="grid">
-    <div class="grid">
-        {{>column source='source' id='backlog'}}
-        {{>column id='sprint'}}
-        {{>column id='doing'}}
-        {{>column id='done'}}
-    </div>
+    {{#if editing}}
+    <button id="doneEditingGrid">Done</button>
+    {{else}}
+    <button id="editGrid">Edit</button>
+    {{/if}}
+    <table class="grid editing--{{editing}}">
+        <thead>
+            <tr id="gridRowHeader" class="grid__row">
+                <th></th>
+                {{#each cols}}
+                    <th class="grid__row__colHeader structHeader {{interactable}} dropzone-col" id="{{_id}}">
+                        {{>structHeader}}
+                        <a href="" class="createCard">&oplus;</a>
+                    </th>
+                {{/each}}
+                {{#if editing}}
+                    <th class="editing">
+                        {{#if addCol}}
+                            {{>editStruct type="addCol"}}
+                        {{else}}
+                        <button id="addCol">Add col</button>
+                        {{/if}}
+                    </th>
+                {{/if}}
+            </tr>
+        </thead>
+        <tbody>
+        {{#each rows}}
+            <tr class="grid__row">
+                <th id="{{_id}}" class="grid__row__rowHeader structHeader {{interactable}} dropzone-row">{{>structHeader}}</th>
+                {{#each ../cols}}
+                    {{#with cell}}
+                        <td id="{{_id}}" class="grid__row__cell {{../_id}} dropzone-card">
+                            {{#each cards}}
+                                {{>card}}
+                            {{/each}}
+                        </td>
+                    {{/with}}
+                {{/each}}
+                {{#if editing}}
+                <td></td>
+                {{/if}}
+            </tr>
+        {{/each}}
+        {{#if editing}}
+        <tr>
+            <td collspan="{{cols.length}}">
+                {{#if addRow}}
+                    {{>editStruct type="addRow"}}
+                {{else}}
+                    <button id="addRow">Add row</button>
+                {{/if}}
+            </td>
+        </tr>
+        {{/if}}
+        </tbody>
+    </table>
 </template>
 
-<template name="column">
-    <div class="grid__column {{source}}" id="{{id}}">
-        <h2>{{id}}</h2>
-        {{#if source}}
-        <a href="" class="createCard">&oplus;</a>
-        {{/if}}
-        {{#each cards id}}
-            {{>card}}
-        {{/each}}
-    </div>
+<template name="structHeader">
+    {{#if editingStruct}}
+        {{>editStruct title=title type=type}}
+    {{else}}
+        {{title}}
+    {{/if}}
 </template>
+
+<template name="editStruct">
+    <input type="text" class="newStruct" data-operation="{{type}}" value="{{title}}"/>
+    <a class="deleteStruct">X</a>
+</template>
+
+<!--<template name="card">-->
+    <!--<div class="card">-->
+        <!--<h3>{{this}}</h3>-->
+    <!--</div>-->
+<!--</template>-->
 
 <template name="card">
-    <div class="card" draggable="true" id="{{_id}}" style="background-color: {{color}}">
+    {{#with card}}
+    <div class="card {{interactable}} dropzone-card" id="{{_id}}" style="background-color: {{color}}">
         <h3>{{title}}</h3>
     </div>
+    {{/with}}
 </template>
 
 <template name="createDialog">
