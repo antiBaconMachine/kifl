@@ -11,7 +11,7 @@ if (Meteor.isClient) {
     });
 
     var interactable = function (interactWhilstEditing) {
-        return ((Session.get('editingGrid') || false) === interactWhilstEditing) ? "draggable" : "";
+        return !Session.get('editingStruct') && ((Session.get('editingGrid') || false) === interactWhilstEditing) ? "draggable" : "";
     };
 
     Template.grid.helpers({
